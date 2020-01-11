@@ -33,5 +33,7 @@ redcarpet:
 defaults:
   -
     values: 
-      author: "tugend"
-      layout: "post"
+      author: tugend
+      layout: post
+      category: misc
+      location: Ovesdal 20, Mårslet
