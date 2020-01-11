@@ -1,0 +1,25 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "_posts"
+		}
+	],
+	"settings": {
+		"files.exclude": {
+			".*": true,
+			"*.gemspec": true,
+			"*Gem*": true,
+			"*.html": true,
+			"_layouts": true,
+			"_site": true,
+			"_includes": true,
+			"css": true,
+			"_sass": true,
+			"LICENSE": true,
+			"_posts": true
+		}
+	}
+}
