@@ -7,11 +7,11 @@
 			"path": "_posts"
 		},
 		{
-			"path": "_sketches"
+			"path": "sketches"
 		}
 	],
 	"settings": {
-		"fixles.exclude": {
+		"files.exclude": {
 			".*": true,
 			"*.gemspec": true,
 			"*Gem*": true,
