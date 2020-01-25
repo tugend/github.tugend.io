@@ -12,7 +12,7 @@ See guide [here](https://help.github.com/en/github/working-with-github-pages/cre
 
   `$ gem install bundler`
 
-- Test locally
+- Develop and test locally
 
   `$ bundler exec jekyll serve`
 

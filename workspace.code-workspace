@@ -5,15 +5,18 @@
 		},
 		{
 			"path": "_posts"
+		},
+		{
+			"path": "_sketches"
 		}
 	],
 	"settings": {
-		"files.exclude": {
+		"fixles.exclude": {
 			".*": true,
 			"*.gemspec": true,
 			"*Gem*": true,
 			"*.html": true,
-			"_layouts": true,
+			"_layouts": false,
 			"_site": true,
 			"_includes": true,
 			"css": true,
