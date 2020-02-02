@@ -228,3 +228,25 @@
   .post-up a:hover{
     opacity: 0.8;
   }
+
+
+/* Technical Post Format
+ * ============================================== */
+    .post--technical {
+        h2, h3, h4, h5 {
+            text-align: left;
+        }
+
+        code {
+            font-family: Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
+            font-size: 14px;
+            line-height: 19px;
+        }
+
+        pre {
+            padding: 23px;
+            line-height: 19px;
+            padding: 23px;
+            border: 1px solid #cccccc;
+        }  
+    }
