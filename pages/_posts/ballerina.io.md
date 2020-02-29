@@ -87,3 +87,30 @@ Listeners:
 ## Other notes
 
 The Robustness Principle: Be conservative in what you send, be liberal in what you accept
+
+* Services represent collections of network-accessible entry points. Resources represent one such entry point.
+
+
+## Challenge
+
+Write a small API, document it with OpenAPI then write three consumers of said service.
+Try to publish it somehow..
+
+* Service: UserRegistry
+- Register user and password
+- Issue user-id
+- Authenticate? user
+- DB + API + Validation
+
+* Service: PointRegistry
+- Given a generic game result, compute the point assignment for the game and save the result
+- E.g. by googling your name and counting the number of positive adjectives if you won 
+- and counting the number of bad adjectives if you lost
+- DB + API + Computation
+
+* Service: Generic game
+- Play a game against a bot that results in either a loss, tie or win
+- DB + API + Computation
+
+* Service: Frontend(s)
+- ...
