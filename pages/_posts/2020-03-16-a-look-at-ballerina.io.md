@@ -4,8 +4,6 @@ category: architecture notes
 tags: language structure 
 ---
 
-# Ballerina.io
-
 ![ballerina.io](/assets/ballerina-io.jpg "ballerina.io")
 
 ## Introduction and expectations
