@@ -1,7 +1,6 @@
 ---
-title: A look at authorization and authentication
-category: security 
-tags: programming C# .NET
+title: A look at authorization and authentication category: security tags:
+programming C# .NET
 ---
 
 I often confuse the two very similar looking words; Authorization and
@@ -27,16 +26,18 @@ not, to determine if something is authentic.
 A user can prove his identity by e.g. presenting a password, item or something
 completely different, assumed to only be accessible by said person.
 
-In literature, they say identity can be proved by three 'authentication factors'.
+In literature, they say identity can be proved by three 'authentication
+factors'.
 1) something you know, e.g. a password
 2) something you have, e.g. a key or a phone
 3) something you are, e.g. like a fingerprint
 
 Multi-factor authentication requires two or more of the above to be presented,
-E.g. presenting a card and a PIN can be described as a two factor authentication.
+E.g. presenting a card and a PIN can be described as a two factor
+authentication.
 
-Strong authentication is apparently defined a bit varying, but basically,
-it boils down to authentication using at least two authentication factors.
+Strong authentication is apparently defined a bit varying, but basically, it
+boils down to authentication using at least two authentication factors.
 
 An example of digital authentication where the burden is put on some trustworthy
 third agency, is generically described as digital authentication using a
@@ -75,15 +76,49 @@ that only allow access for people with a key (one factor authentication)
 
 ## ----
 
-.NET Core User Secrets
-Git credentials manager
-Using Google as a csp.
-Basic Authentication.
-JWT Tokens.
-Setting up Firebase? with a authentication scheme
+.NET Core User Secrets Git credentials manager Using Google as a csp. Basic
+Authentication. JWT Tokens. Setting up Firebase? with a authentication scheme
 
 
 ## Implementation details
 
-### Authentication
-### Authorization
+### Basic Authentication
+
+Basic access authentication, more commonly referred to as just basic
+authentication, is perhaps the most simple form of web authentication that's
+standardized. 
+
+Each HTTP request contains an authorization header with a base64 encoded
+username and password.
+
+```
+Authorization: Basic <credentials>
+<credentials> is base64 encoded string "<username>:<password>"
+```
+
+Since the header is not encrypted in anyway, anyone can decode them and read the
+username and password, therefore basic authentication is often used with https
+to ensure confidentiality. To avoid requesting password all the time, the
+browser will typically cache the headers for some amount of time. There is in
+fact no clearly defined way to 'log out' of a web browser with a cached basic
+authentication header.
+
+#### Protocol
+A website that has basic access authorization for a resource
+www.pictures.com/pensils, would return HTTP Status 401 Unauthorized with the
+header
+
+```
+WWW-Authenticate: Basic realm="User Visible Realm".
+```
+
+The browser or orther user-agent will then by default popup and ask the user to
+enter his or her credentials and add the required header.
+
+Source: https://en.wikipedia.org/wiki/Basic_access_authentication
+
+#### Digest Access Authentication
+
+A stronger version of basic authentication 
+
+
