@@ -1,7 +1,0 @@
-POST https://localhost:5010/restricted/authenticate HTTP/1.1
-{
-    "username": "bob",
-    "password": "password"
-}
-
-GET https://localhost:5011/restricted HTTP/1.1
