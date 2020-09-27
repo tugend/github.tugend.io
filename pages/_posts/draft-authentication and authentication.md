@@ -6,119 +6,110 @@ programming C# .NET
 I often confuse the two very similar looking words; Authorization and
 Authentication. In this post I'll dig into what they mean and what I feel is
 relevant to know about them, I'll close the blog by having a look into some
-recommended implementation details when working with security in .NET.
+implementation details when working with security in .NET.
 
 ## Definitions
 
 ### Authentication
 
-If you authenticate an identity, you verify someone is who they claim they are.
-In layman's terms, you can authenticate by presenting proof of identity, by
-showing for example your passport. If an identity has been authenticated, it
-means someone has accepted the proof of identity. 
+What does it mean? If you authenticate an identity, you verify someone is who
+they claim they are. In layman's terms, you can authenticate by presenting 'proof
+of identity', for example by showing your passport. If an identity has been
+authenticated, it means someone has accepted the given 'proof'.
 
-You can also authenticate a piece of art and many other things too, usually this
-means to authenticate the age of the piece, some properties like what it's made
-of, or the identity of artist who is claimed to have made the piece. In all
-cases it's really about the same thing, to verify whether a claim is true or
-not, to determine if something is authentic.
+As another example, you can authenticate a piece of art, is it as old as claimed
+ or is it a fake?
 
-A user can prove his identity by e.g. presenting a password, item or something
-completely different, assumed to only be accessible by said person.
+Authentication or the act of determining if something is authentic, really just
+means figuring out whether or not you should believe a given claim.
 
-In literature, they say identity can be proved by three 'authentication
+In security and programming, authentication often concern how a user can prove
+his identity, for example to get access to restricted resources. In the
+literature, they often break such proofs of identity into three 'authentication
 factors'.
-1) something you know, e.g. a password
-2) something you have, e.g. a key or a phone
-3) something you are, e.g. like a fingerprint
 
-Multi-factor authentication requires two or more of the above to be presented,
-E.g. presenting a card and a PIN can be described as a two factor
-authentication.
+1) Something you know and a fraud would not, e.g. a password
+2) Something you have, which a fraud would not, e.g. a key or a phone
+3) Something you are, which a fraud is not, e.g. like a fingerprint
 
-Strong authentication is apparently defined a bit varying, but basically, it
-boils down to authentication using at least two authentication factors.
+The term 'multi-factor authentication' or strong authentication relates to the
+above by requiring two or more different factors of authentication, such as
+presenting a card and a PIN code. Using multiple factors is assumed to increase
+the difficulty of cheating the system.
 
-An example of digital authentication where the burden is put on some trustworthy
-third agency, is generically described as digital authentication using a
-credential service provider (CSP). Typically you prove your identity by having
-actual contact with a representative of the CSP, who would then offer you a
-digital authenticator in the form of a physical key-generator or an app on your
-phone. Now you can use this CSP authenticator along with typically a password
-and registered username to prove digitally who you are.
+A common case, is digital authentication where the burden is put on some
+trustworthy third agency. This is generically described as digital
+authentication using a credential service provider or CSP. Typically you prove
+your identity by having actual contact with a representative of the CSP, who
+would then offer you a digital authenticator in such as a physical key-generator
+or an app on your phone. Now you can use this CSP authenticator along with
+typically a password and registered username to prove who you are using
+multi-factor authentication.
 
-The opposition of authentication is the intent to forge, i.e. a forger would try
-to forge an identity that fools what ever authentication schemes are used, e.g.
-by sending emails that look like they come from your bank, by claiming they are
-someone else, or printing fake bills.
+Finally, the antagonist side of authentication is the intent to forge, i.e. a
+forger would try to create a fake identity proof to cheat the authentication of
+the system, for example, by sending emails that look like they come from your
+bank, by claiming they are someone else, or printing fake bills.
 
 Source: [Wikipedia](https://en.wikipedia.org/wiki/Authentication)
 
 ### Authorization
 
 Authorization is the act of determining if access physically or digitally is
-allowed for someone. I.e. given an access policy, you can determine if someone
-is authorized to access a resource. Often given an access policy, you also want
-to authenticate the identity of the person whom is requesting access, at least
-if the access policy is based on identity or something similar.
+should be allowed, here it naturally follows that if not everyone should have
+access, we need to authenticate the claim of the requesting<> that they are part
+of the group who should have access.
 
-Often the term is used for computer programs where some digital policy for
-example categorizes users in the category 'managers' a different level of access
-than the category 'employee', or 'guest'. In a military base you'd expect to
-have a similar non-digital system restricting access to certain part of the base
-to individuals of a certain rank and clearance.
+Given an 'access policy' and an authentication scheme, you can determine if
+someone is authorized to access a resource. For example, an access policy could
+simply be a list of identities who should be allowed access and the scheme could
+be to trust anyone with the username and password.
 
-Authorization naturally occur in the reflection of access restriction, i.e. some
-kinds of access are restricted to a subset of the users who could possible try
-to gain access. One of the simplest cases of authorization is of course a door
-that only allow access for people with a key (one factor authentication)
-
+The notion of authentication and authorization is more common than one might
+initially believe. As a very trivial example, think of the imple locked door
+that allow access for people with the right key.
 
 ## ----
 
-.NET Core User Secrets Git credentials manager Using Google as a csp. Basic
-Authentication. JWT Tokens. Setting up Firebase? with a authentication scheme
-
-
-## Implementation details
+## The most common digital authentication schemes
 
 ### Basic Authentication
 
 Basic access authentication, more commonly referred to as just basic
 authentication, is perhaps the most simple form of web authentication that's
-standardized. 
+standardized.
 
-Each HTTP request contains an authorization header with a base64 encoded
-username and password.
+Each HTTP request contains an authorization header with a base64 encoded string
+consisting of your username and password separated by ':'.
 
-```
-Authorization: Basic <credentials>
-<credentials> is base64 encoded string "<username>:<password>"
-```
+Since the header is not encrypted in anyway, anyone can decode the
+authentication and read the username and password. Therefore basic
+authentication is often used together https to ensure confidentiality.
 
-Since the header is not encrypted in anyway, anyone can decode them and read the
-username and password, therefore basic authentication is often used with https
-to ensure confidentiality. To avoid requesting password all the time, the
-browser will typically cache the headers for some amount of time. There is in
-fact no clearly defined way to 'log out' of a web browser with a cached basic
-authentication header.
+To avoid requesting the password all the time, the browser will typically cache
+the headers for some amount of time. There is in fact no standardized way to
+'log out' of a web browser with a cached basic authentication header.
 
-#### Protocol
-A website that has basic access authorization for a resource
-www.pictures.com/pensils, would return HTTP Status 401 Unauthorized with the
-header
+#### Example
 
-```
+A website that with basic access authorization for a resource for example
+www.pictures.com/pencils, would return HTTP Status 401 Unauthorized with the
+the following header.
+
+```http
 WWW-Authenticate: Basic realm="User Visible Realm".
 ```
 
-The browser or orther user-agent will then by default popup and ask the user to
-enter his or her credentials and add the required header.
+Then a browser would by default popup and ask the user to enter his or her
+credentials and add the required header.
+
+Given a username `'user1234'` and password `'pass1234'` would become the string
+`'user1234:pass1234'` and encoded to `'dXNlcm5hbWU6cGFzc3dvcmQ='`, finally
+yielding a header header key-value pair like `Authorization: Basic
+dXNlcm5hbWU6cGFzc3dvcmQ=`.
 
 Source: https://en.wikipedia.org/wiki/Basic_access_authentication
 
-#### Digest Access Authentication
 
-A stronger version of basic authentication 
-
+### Json Web Tokens (JWTs)
 

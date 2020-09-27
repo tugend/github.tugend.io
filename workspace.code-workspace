@@ -22,6 +22,14 @@
 			"css": true,
 			"_sass": true,
 			"LICENSE": true,
-		}
+		},
+		"spellright.language": [
+			"en"
+		],
+		"spellright.documentTypes": [
+			"markdown",
+			"latex",
+			"plaintext"
+		]
 	}
 }
