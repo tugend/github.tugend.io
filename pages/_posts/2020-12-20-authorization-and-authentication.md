@@ -96,7 +96,7 @@ Consider a website, that want to protect the resource at
 access said resource without a valid authentication header they would receive a
 HTTP Status 401 Unauthorized with the the following header in reply.
 
-```
+```text
 WWW-Authenticate: Basic realm="User Visible Realm".
 ```
 
@@ -129,13 +129,13 @@ issues by a trustworthy party and not changed.
 The token should always be sent via https and include a reasonable short expiry
 time since anyone can use it if leaked or stolen.
 
-A typical use of JWTs is a single-sign-ons to a web-site. In such a case the user
-would send his credentials to some secure third party page/server (CSP) that will then
-return a temporary access token or bearer token for the given site. Said token
-is then passed as a 'bearer token' in the authorization header for all following
-requests to the give web-site. _In my personal opinion it's a mess that everyone
-keeps calling it token, jwt, access-token and bearer token while often meaning
-the same thing!_
+A typical use of JWTs is a single-sign-ons to a web-site. In such a case the
+user would send his credentials to some secure third party page/server (CSP)
+that will then return a temporary access token or bearer token for the given
+site. Said token is then passed as a 'bearer token' in the authorization header
+for all following requests to the give web-site. _In my personal opinion it's a
+mess that everyone keeps calling it token, JWT, access-token and bearer token
+while often meaning the same thing!_
 
 The standardized claim names of jwts are only three letters long, a
 decision based on the intent to keep the resulting authorization header small in
@@ -214,11 +214,12 @@ as either a cookie or in local storage, and send it along along in the
 authorization header for all the following requests to continuously prove his
 identity as well as any other claims included in the token.
 
-```
+```text
 Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5c....A17rMEuw
 ```
 
 Main sources:
+
 - [wiki/json_web_token](https://en.wikipedia.org/wiki/JSON_Web_Token)
 - [jwt.io/introduction](https://jwt.io/introduction/)
 - [tools.ietf/tfc7519/section 4.1](https://tools.ietf.org/html/rfc7519#section-4.1)
