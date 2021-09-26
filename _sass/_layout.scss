@@ -249,4 +249,18 @@
             padding: 23px;
             border: 1px solid #cccccc;
         }  
+
+        blockquote {
+            font-style: normal;
+            font-weight: normal;
+            color: black !important;
+            display: inline-block;
+            background: lightyellow;
+            padding: 15px;
+            padding-right: 25px;
+        }
+
+        blockquote div {
+            background: yellow;
+        }
     }
