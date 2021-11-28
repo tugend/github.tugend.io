@@ -58,7 +58,7 @@ api version in the url. If you prefer to control versioning via a header
 instead, that's also an option.
 
 
-```C#
+```csharp
 // Startup.cs
 
 services
@@ -71,7 +71,7 @@ output an OpenApi document per version using the ApiVersionDescriptionProvider,
 and configure Swagger UI to combine and display each version document in a
 webpage with an drop-down to easily switch version.
 
-```C#
+```csharp
 // ConfigureSwaggerGen.cs
 
 public void Configure(SwaggerGenOptions options)
@@ -83,7 +83,7 @@ public void Configure(SwaggerGenOptions options)
 }
 ```
 
-```C#
+```csharp
 // ConfigureSwaggerUi.cs
 
 public void Configure(SwaggerUIOptions options)
@@ -103,7 +103,7 @@ To actually use versions in our controller, we need to update the route
 definitions per controller by adding the version in the route, and annotate each
 endpoint to clearly mark which version(s) it belongs and voila.
 
-```C#
+```csharp
 // WeatherController.cs
 
 [ApiController]
@@ -173,7 +173,7 @@ that exactly match the endpoints marked under version 1.0.
 We're left with another issue though, since now we have our legacy endpoints
 documented in every single api version, which of course isn't what we want.
 
-```C#
+```csharp
 // WeatherController.cs
 
 [ApiController]
@@ -182,7 +182,7 @@ documented in every single api version, which of course isn't what we want.
 public class WeatherController : ControllerBase
 ```
 
-```C#
+```csharp
 // ConfigureApiVersioning.cs
 
 public void Configure(ApiVersioningOptions options)
@@ -197,7 +197,7 @@ We can solve this final issue by adding a pre-processing step to our OpenApi
 generation that remove the legacy endpoints from all but the document for
 version 1 by adding a custom DocumentFilter implementation.
 
-```C#
+```csharp
 // ConfigureSwaggerGen.cs
 public void Configure(SwaggerGenOptions options)
 {
@@ -277,7 +277,7 @@ Major.Minor.Patch-Status, where status can be any alphanumeric value).
 
 First we'll add the name of our API as the status part of the version as shown below.
 
-```C#
+```csharp
 // WeatherController.cs
 
 [ApiVersion("2-weather")]
@@ -294,7 +294,7 @@ public IEnumerable<ForecastV1Response> GetV1Forecast()
 That worked! Sort of. It would be neater if we moved the pseudo status first.
 We can do that by adding a substitution format to the API Explorer options.
 
-```C#
+```csharp
 // ConfigureApiExplorer.cs
 
 public void Configure(ApiExplorerOptions options)
@@ -315,7 +315,7 @@ at the right place and we're done! Of course you'll still have to add some great
 textual documentation for your documents but that's a different challenge. =)
 
 
-```C#
+```csharp
 // ConfigureSwaggerUi.cs
 
 public void Configure(SwaggerUIOptions options)
