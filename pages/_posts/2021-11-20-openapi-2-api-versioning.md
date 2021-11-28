@@ -1,52 +1,58 @@
 ---
-category: technical tags: programming C# OpenApi layout: post--technical
-published: true title: "OpenApi: Api Versioning [Part 2/3]"
+category: technical 
+tags: programming C# OpenApi 
+layout: post--technical
+title: "Api Versioning (OpenApi 2/3)"
 ---
 
-This is the second part about HTTP based API versioning in dotnet. In the following
-I'll describe what I consider to be good practice approach to API versioning.
+This is the second part about HTTP based API versioning in .Net Core. In the
+following I'll describe what I consider to be good practice approach to API
+versioning.
 
-I'm assuming a reasonable complex API with a long lifetime and in active
+Let us first assume a fairly complex API with a long lifetime and active
 development. In such a case I'd claim it's reasonable to expect a certain
 periodicity of breaking changes, and a need to support previous versions for
 some time, requiring long-lived maintenance of legacy versions.
 
 I suggest that the best approach to such a situation, is to include a major
 version number in the route endpoints, and for each breaking change, to add a
-new complete open api document essentially coping all unchanged endpoints from
+new complete OpenApi document essentially copying all unchanged endpoints from
 the previous version. 
 
-The benefit of this is making it easier for integrators to focus on one API
-version at a time, it's easier to keep each clearly documented, and we reduce the
-risk and incentive to build implementations that span multiple versions.
+Benefits would include a much cleaner API documentation compared to e.g. a
+single document that mix all versions in one way or another, as well as enable a
+smoother maintenance and support due a reduced risk and incentive for building
+implementations that span multiple versions.
 
-The API maintainers on the other hand will have an easier time doing
-support for the same reasons (avoiding multiple version implementations).
+The major drawback of the approach would seem to be, that we repeat and must
+maintain the same documentation across the multiple versions, but fortunately,
+we can do this with minimal effort as we're only required to annotate which
+endpoints should exist in which versions!
 
-The major drawback of this approach seems to be, that we repeat and must
-maintain the same documentation across the multiple versions, but this
-fortunately we can do this with minimal effort, and we're only required to
-annotate which endpoints should exist in which versions!
+
+### Table of Contents
 
 - [Implementation Details](#implementation-details)
-  - [Automatically add major version to all endpoints](#automatically-add-major-version-to-all-endpoints)
 - [Special cases](#special-cases)
   - [Transition from a non-versioned API by configuring a fallback version](#transition-from-a-non-versioned-api-by-configuring-a-fallback-version)
-  - [Squared complexity, how to support both multiple apis and api-versions in the same drop down?](#squared-complexity-how-to-support-both-multiple-apis-and-api-versions-in-the-same-drop-down)
+  - [Squared complexity, how to support multiple APIs and API-versions?](#squared-complexity-how-to-support-multiple-apis-and-api-versions)
 - [Sources](#sources)
+  - [Articles](#articles)
+  - [NugetPackages](#nugetpackages)
+  - [Code](#code)
 
 ## Implementation Details
 
-I will explain how to implement API versioning in the following steps.
-A working implementation is referenced in [Sources](#Sources).
-
-### Automatically add major version to all endpoints
+I will explain how to implement API versioning in the following steps,
+by semi-automatically adding a major version number to all annotated routes.
+A working implementation is referenced in the [Sources Section](#Sources).
 
 First we need to install the following NuGet Packages;
 `Microsoft.AspNetCore.Mvc.Versioning` and
-`Microsoft.AspNetCore.Mvc.Versioning.ApiExplorer`. Versioning add support for
-making versioned endpoints, and ApiExplorer adds support for communicating this
-information to swagger via `IApiVersionDescriptionProvider`.
+`Microsoft.AspNetCore.Mvc.Versioning.ApiExplorer`. Versioning allow us to extend
+our controllers to produce versioned endpoints, and ApiExplorer adds support for
+communicating this information to swagger via `IApiVersionDescriptionProvider`.
+
 SubstituteApiVersionInUrl is used to define we want to automatically include the
 api version in the url. If you prefer to control versioning via a header
 instead, that's also an option.
@@ -60,7 +66,7 @@ services
     .AddVersionedApiExplorer(options => options.SubstituteApiVersionInUrl = true });
 ```
 
-The hookup with Swagger is also straightforward. Set up swagger generator to
+The hookup with Swagger is straightforward. Set up your swagger generator to
 output an OpenApi document per version using the ApiVersionDescriptionProvider,
 and configure Swagger UI to combine and display each version document in a
 webpage with an drop-down to easily switch version.
@@ -93,7 +99,7 @@ public void Configure(SwaggerUIOptions options)
 }
 ```
 
-Finally, to actually use versions in our controller, we need to update the route
+To actually use versions in our controller, we need to update the route
 definitions per controller by adding the version in the route, and annotate each
 endpoint to clearly mark which version(s) it belongs and voila.
 
@@ -130,9 +136,6 @@ public class WeatherController : ControllerBase
 
 Let's see how the final output looks like. =)
 
-![Version 2 selected](/assets/open-api/api-versioning-v2-doc.png)  
-*Weather API Version 2*
-
 ![Version 3 selected](/assets/open-api/api-versioning-v3-doc.png)
 *Weather API Version 3*
 
@@ -144,15 +147,15 @@ I experienced a few special cases that I found interesting and dug a bit further
 
 Let us assume your team was a bit quick to publish their first API and they
 didn't include a versioning scheme in the first endpoints, how can you make a
-soft transition to versioned API scheme?
+soft transition to a versioned API scheme?
 
-Imagine someone outside the company is using the API right, and you can't be
-sure how many months(years?) it will take them to transition to your new
-version. You could be forced to preserve an explicit documentation for the
-legacy 'non-versioned' version until the legacy endpoints could be safely
-removed!
+Imagine someone outside the company is using the API already, and you can't be
+sure how many months(years?) it will take for them to transition to your new and
+better way of making endpoints. You could be forced to preserve an explicit
+documentation for the legacy 'non-versioned' version until the legacy endpoints
+could be safely removed!
 
-We can handle this case easily albeit at the cost a bit of extra complexity.
+We can solve this case at the cost a bit of extra complexity.
 This issue also nicely showcases how versatile the OpenApi integration can be by
 allowing us to directly change the generated documents on the fly.
 
@@ -162,10 +165,13 @@ version 1 and the legacy non-versioned endpoints will be identical I've opted to
 keep them in the same document for clarity, but one could also add a separate
 'Legacy' version instead.
 
-First we add the versioned route to our controller, but KEEP the non-versioned route too. Then we configure the ApiExplorer options to include fallback to version 1.0 if not specified, this defines that we sould document the non-versioned api identical to version 1.0.
+First we add the versioned route to our controller, but keep the non-versioned
+route. Then we configure the ApiExplorer options to default to version 1.0 if
+not specified. The result is a non-versioned API document in our generated output 
+that exactly match the endpoints marked under version 1.0.
 
-The fun part is that we know have our legacy endpoints documented in every single api version,
-which of course isn't what we want.
+We're left with another issue though, since now we have our legacy endpoints
+documented in every single api version, which of course isn't what we want.
 
 ```C#
 // WeatherController.cs
@@ -187,9 +193,9 @@ public void Configure(ApiVersioningOptions options)
 }   
 ```
 
-We can solve this by adding a pre-processing step to our swagger generation to
-remove the legacy endpoints from all but the version 1 by adding
-'RemoveDefaultApiVersionRouteDocumentFilter' as shown below and voila.
+We can solve this final issue by adding a pre-processing step to our OpenApi
+generation that remove the legacy endpoints from all but the document for
+version 1 by adding a custom DocumentFilter implementation.
 
 ```C#
 // ConfigureSwaggerGen.cs
@@ -253,19 +259,21 @@ public class RemoveDefaultApiVersionRouteDocumentFilter : IDocumentFilter
 
 ```
 
+The final output we get now looks like this, in our sample API; two deprecated versions of the same endpoints.
+
 ![Sample documentation with fallback version](/assets/open-api/api-versioning-v1-doc-with-removed-api-version-parameter.png)
 *Sample documentation with fallback version*
 
-### Squared complexity, how to support both multiple apis and api-versions in the same drop down?
+### Squared complexity, how to support multiple APIs and API-versions?
 
-If we want multiple separate versions but ALSO need to support multiple APIs,
-what then? For example, let's imagine we want to have both a report- and a
-weather API with matching controllers. 
+If we want multiple separate versions but ALSO want to have multiple named APIs,
+what then? For example, let's imagine we want to have both a versioned report-
+and a weather API with matching controllers. 
 
 We can exploit the definition of semantic versioning here, assuming we only care
 about separating our api per major version, which I would claim is a very
-reasonable assumption. Semantic versioning defines a version as
-Major.Minor.Patch-Status, where status can be any alphanumeric value. 
+reasonable assumption (Semantic versioning defines a version as
+Major.Minor.Patch-Status, where status can be any alphanumeric value). 
 
 First we'll add the name of our API as the status part of the version as shown below.
 
@@ -280,6 +288,7 @@ public IEnumerable<ForecastV1Response> GetV1Forecast()
 ```
 
 ![Sample documentation with multiple named and versioned APIs](/assets/open-api/square-api-v1.png)
+
 *Sample documentation with multiple named and versioned APIs*
 
 That worked! Sort of. It would be neater if we moved the pseudo status first.
@@ -297,11 +306,14 @@ public void Configure(ApiExplorerOptions options)
 ```
 
 ![Sample documentation with name first](/assets/open-api/square-api-v2.png)
+
 *Sample documentation with name first*
 
 Now, this would be even neater if we could make our drop-down list
 alphabetically ordered too. Let's finish with that by adding a trivial order-by
-at the right place, update the documentation per document and we're done!
+at the right place and we're done! Of course you'll still have to add some great
+textual documentation for your documents but that's a different challenge. =)
+
 
 ```C#
 // ConfigureSwaggerUi.cs
@@ -320,6 +332,7 @@ public void Configure(SwaggerUIOptions options)
 ```
 
 ![Sample documentation with alphabetically ordering](/assets/open-api/square-api-v3.png)
+
 *Sample documentation with alphabetically ordering*
 
 The sky is the limit, but I think this is a neat proof of concept that I would
@@ -327,5 +340,14 @@ be entirely comfortable to use in a professional setting.
 
 ## Sources
 
+### Articles
 * [Documentation for the APIExplorers substitution format](https://github.com/dotnet/aspnet-api-versioning/wiki/Version-Format#custom-api-version-format-strings)
 * [Source on combining APIs and versions in Swagger](https://github.com/dotnet/aspnet-api-versioning/issues/516)
+
+### NugetPackages
+* `Microsoft.AspNetCore.Mvc.Versioning`
+* `Microsoft.AspNetCore.Mvc.Versioning.ApiExplorer`
+
+### Code
+* [ApiVersioning](https://github.com/tugend/OpenApiExamples/tree/main/ApiVersioning)
+* [ApiVersioningTests](https://github.com/tugend/OpenApiExamples/tree/main/ApiVersioningTests)

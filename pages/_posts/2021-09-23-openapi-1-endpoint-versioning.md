@@ -2,8 +2,7 @@
 category: technical
 tags: programming C# OpenApi
 layout: post--technical
-published: true
-title: "OpenApi: Endpoint Versioning [Part 1/3]"
+title: "Endpoint Versioning (OpenApi 1/3)"
 ---
 
 What I'd like to address is this post, is some of the ways we can
@@ -17,12 +16,22 @@ This is article the first of three blog posts on the subject of OpenApi.
 ### Table of Contents
 
 - [Initial version](#initial-version)
+  - [Tip: 1: Routes should be lower case by convention](#tip-1-routes-should-be-lower-case-by-convention)
+  - [Tip 2: Separate your resources into clear 'namespaces'](#tip-2-separate-your-resources-into-clear-namespaces)
 - [The first breaking change](#the-first-breaking-change)
+  - [How to specify version](#how-to-specify-version)
 - [Introducing endpoint versions](#introducing-endpoint-versions)
+  - [Model naming and versions](#model-naming-and-versions)
+  - [What can we do if the initial endpoint was un-versioned?](#what-can-we-do-if-the-initial-endpoint-was-un-versioned)
 - [Final endpoint versioned API](#final-endpoint-versioned-api)
 - [Discussion](#discussion)
+  - [Pros](#pros)
+  - [Cons](#cons)
 - [Conclusion](#conclusion)
 - [Sources](#sources)
+  - [Articles](#articles)
+  - [NugetPackages](#nugetpackages)
+  - [Code](#code)
 
 ### Swagger or OpenApi?
 
