@@ -1,41 +1,57 @@
-# NOTES
+---
+category: technical 
+tags: programming C# OpenApi 
+layout: post--technical
+title: "Api Versioning (OpenApi 3/3)"
+---
 
-## level 0
-✔️ Write a simple controller for silent auctioning off animals
-✔️ GET auction list with animals and starting bid
-✔️ Put animal for sale with minimum bid, id, age and weight
-✔️ Put bid animal-id, bid, bidder-id
-✔️ TODO: screenshot -> marked areas and how to edit them
-✔️ C# xml docs (name?)
-✔️ Enums as string values, string set
+Diverging from my previous approach, I'll try to start this post,
+by stating which learning goals I had, followed by a commentary on
+how I reached the given goals.
 
-## level 1
-✔️ Generate meaningful example values in swagger
+## Goals
 
-## level 3
-* Handle name clashing models (also in n-swag..)
-✔️ Response and request models with required and optional attributes, default non-nullable validation
-✔️ optional+required should also work outside of the documentation
+### Level 0
 
-## level 4
-✔️ JetBrains annotations
-  
-## level 5
-✔️ Verify previous values match with n-swag generation and tests
+* ✔️ Write a simple API for auctioning rice.
+    * ✔️ Get list of items on auction including item id, minimum bid, batch quantity and batch quality.
+    * ✔️ Post an item up for auction.
+    * ✔️ Put a bid for a selected item.
+* ✔️ Document the API with meaningful descriptions.
+* ✔️ Public never-used parameters should not result in warnings or require disabling-warning annotations.
+* 📦 Determine whether request and responses should be records, structs or classes.
+
+
+
+### Level 1
+* ✔️ Support multiple models with same names, e.g. Request, Response
+
+### Level 2
+* ✔️ Extend the API with meaningful example values
+* ✔️ Example values should apply in swagger when trying an endpoint
+* 📦 Example values should be randomized?
+
+### Level 3
+* ✔️ Leverage C# nullable reference types for documentation
+    * ✔️ Nullable value types by default are nullable optional.
+    * ✔️ 'Non-Nullable' value types by default are non-nullable and required.
+    * ✔️ Nullable reference types by default are nullable optional.
+    * ✔️ 'Non-Nullable' reference types by default are non-nullable and required.
+
+* ✔️ Leverage C# nullable reference types for model validation such that 
+    * ✔️ Nullable value types by default are nullable optional.
+    * ✔️ 'Non-Nullable' value types by default are non-nullable and required.
+    * ✔️ Nullable reference types by default are nullable optional.
+    * ✔️ 'Non-Nullable' reference types by default are non-nullable and required.
+
+### Level 4
+* ✔️ Generate an easy to use out of the box client stub from the API.
+    * ✔️ Without model namespace clashes
+    * ✔️ Including transferred nullable types
+
 * https://docs.microsoft.com/en-us/aspnet/core/tutorials/getting-started-with-nswag?view=aspnetcore-6.0&tabs=visual-studio
 * https://aevitas.medium.com/how-to-automatically-generate-clients-for-your-restful-api-fa34a6b408ff
 
-## level 6
-* Quick document of how to import into swagger
-* Try to use code generation and postman open-api import for work examples
-* TODO: figure out how to let example values propagate into postman
-* TODO: quick! stabilize!
-
-## Special cases
-
-### How to handle name space clashes
-### 
-### Authentication via swagger? (meh.. outside of topic)
 
 ## Sources
 
@@ -51,6 +67,7 @@
 * https://mattfrear.com/2015/04/21/generating-swagger-example-responses-with-swashbuckle/
 * https://github.com/mattfrear/Swashbuckle.Examples
 * https://youtrack.jetbrains.com/issue/RIDER-11836
+* https://jones.bz/c-8-0-nullable-reference-types-in-web-api-validation/
 
 ## NOTES
 
