@@ -3,6 +3,7 @@ category: technical
 tags: programming C# OpenApi 
 layout: post--technical
 title: "Api Versioning (OpenApi 3/3)"
+published: false
 ---
 
 Diverging from my previous approach, I'll try to start this post,
@@ -76,6 +77,7 @@ The resulting API looks like this
 *Exampled request*
 
 ### Support namespaced models for OpenAPI
+<<<<<<< HEAD
 
 Since I opted for a namespaced vertical sliced implementation of my controller,
 it fell naturally to also allow duplicate model names, i.e. `Response` and
@@ -152,6 +154,84 @@ inheritance.
 
 The packages from `Matt Frear`, `Swashbuckle.AspNetCore.Filters` and `Swashbuckle.AspNetCore.Filters.Abstractions` gives a lot more control for generating OpenAPI examples and other fun stuff.
 
+=======
+
+Since I opted for a namespaced vertical sliced implementation of my controller,
+it fell naturally to also allow duplicate model names, i.e. `Response` and
+`Request` for the top most types per endpoint. I really like to preserve the
+freedom of naming here, because I often see some weird naming decisions and very
+loooong names otherwise, which otherwise becomes necessary to avoid name
+clashes. In my opinion this is simple, nice and easier to work with.
+
+It requires us to use namespaces in our OpenApi output too. It's just a
+one-liner, easy peasy. In this case, I even truncated the namespace a bit to
+avoid it being longer than necessary.
+
+```csharp
+services.AddSwaggerGen(c =>
+{
+    ...
+    // Use limited name spacing, show full name from the third '.'
+    // E.g. ExampledApi.Controllers.Auction.GetAuctionedItems.Response -> GetAuctionedItems.Response
+    c.CustomSchemaIds(x => x.FullName?.StripUntil('.', 3));
+    ...
+}
+```
+
+![Name-spaced schemas](/assets/open-api/part-3-exampled-api/namespaced-schemas.png "Name-spaced schemas")  
+*Name-spaced schemas*
+
+### Public never-used parameters should not result in warnings or require disabling-warning annotations
+
+For a long time I've been really annoyed by some warnings I also didn't want to disable entirely,
+and maintaining suppression annotations per class was also ugly. To my happy surprise, JetBrains have a package `JetBrains.Annotations` package with a `PublicAPI` tag that nicely documents the classes and part of a public API and disable the warnings in exactly the right manner. Yes!
+
+The cause of the issue is that it's common to create public settable properties
+for API types and then intellisense will think that you don't use those properties.
+
+```csharp
+[SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
+[SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Global")]
+public class Request
+{
+    /// <example>250</example>
+    public int MinimumBidDkk { get; init; }
+```
+
+```csharp
+[PublicAPI]
+public class Request
+{
+    /// <example>250</example>
+    public int MinimumBidDkk { get; init; }
+```
+
+## Should I use records, structs or classes for my API types?
+
+I think this
+[answer|https://stackoverflow.com/questions/64816714/when-to-use-record-vs-class-vs-struct]
+on StackOverflow was nice and to the point. There's a lot more to it, but I like the notion of using the record type for data-transfer like purposes, classes to carry logic and do side effects, and structs for primitives if any.
+
+Basically, **structs** are *pass by value* and should be used to represent single
+value primitives less than 16 byte sizes, comparable to int, double, point ect. 
+
+**Records** are *pass by reference*, by default immutable and a good value type to
+carry data without any added behavior logic.
+
+**Classes** should be used if you want to encapsulate mutable behavior and
+inheritance.
+
+
+---
+
+### Level 2: Advanced generation example values
+
+* ✔️ Extend the API with meaningful example values.
+* ✔️ Example values should apply in swagger UI when trying an endpoint.
+
+The packages from `Matt Frear`, `Swashbuckle.AspNetCore.Filters` and `Swashbuckle.AspNetCore.Filters.Abstractions` gives a lot more control for generating OpenAPI examples and other fun stuff.
+
+>>>>>>> 544e75f (draft open-api-3 +2)
 Initially I though this was necessary to control example values in my openAPI output,
 but I later discovered that the xml comment `<example>` really does it all.
 
@@ -299,6 +379,7 @@ public class MakeNonNullableValueTypesRequiredResolver : DefaultContractResolver
 }
 ```
 
+<<<<<<< HEAD
 TODO: cleanup current code base (30 minutes exercise)
 TODO: finish code generation
 TODO: review and cleanup sources
@@ -306,12 +387,25 @@ TODO: review and cleanup text draft
 TODO: publish!
 ---
 
+=======
+>>>>>>> 544e75f (draft open-api-3 +2)
 ### Level 4
 * ✔️ Generate an easy to use out of the box client stub from the API.
     * ✔️ Without model namespace clashes
     * ✔️ Including transferred nullable types
     * Support code generation with selective filtering i.e. only v1, or only for retail api ect.
     * Try to apply it in practice on work example json!
+<<<<<<< HEAD
+=======
+
+
+TODO: review and cleanup sources
+TODO: finish code generation part of the post
+TODO: try it out on a work API!
+TODO: publish!
+---
+
+>>>>>>> 544e75f (draft open-api-3 +2)
 
 * https://docs.microsoft.com/en-us/aspnet/core/tutorials/getting-started-with-nswag?view=aspnetcore-6.0&tabs=visual-studio
 * https://aevitas.medium.com/how-to-automatically-generate-clients-for-your-restful-api-fa34a6b408ff
@@ -340,6 +434,11 @@ TODO: publish!
 // https://newbedev.com/asp-net-core-require-non-nullable-types
 
 // TODO: clear copies should also be included in the sample code
+<<<<<<< HEAD
+=======
+
+## Code 
+>>>>>>> 544e75f (draft open-api-3 +2)
 
 ## NOTES
 
