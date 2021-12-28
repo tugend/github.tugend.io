@@ -5,35 +5,54 @@ layout: post--technical
 title: "Api Versioning (OpenApi 3/3)"
 ---
 
-Diverging from my previous approach, I'll try to start this post,
-by stating which learning goals I had, followed by a commentary on
-how I reached the given goals.
+<pre style='background:yellow;border:black;color:black'>
+    DRAFT
+</pre>
+
+Diverging from my previous approach, I'll try to begin each section,
+by stating my learning goals followed by a commentary and implementation details.
 
 ## Level 1: The basics
 
 * ✔️ Write a simple API for auctioning rice.
     * ✔️ Get list of items on auction including item id, minimum bid, batch quantity and batch quality.
-    * ✔️ Post an item up for auction.
+    * ✔️ Post an item for auction.
     * ✔️ Put a bid for a selected item.
 * ✔️ Document the API with meaningful descriptions.
-* ✔️ Support namespaced models for OpenAPI
+* ✔️ Support namespaced model output for OpenAPI.
 * ✔️ Public never-used parameters should not result in warnings or require disabling-warning annotations.
 * ✔️ Should I use records, structs or classes for my API types?
 
 ### Write a simple API for auctioning rice
 
-I implemented a basic AspNet Core WebApi, added swagger support (see previous
-posts), everything pretty boilerplate. 
+I implemented a basic AspNet Core WebApi and added swagger support (see previous
+posts), very much straightforward boilerplate code. 
 
-I've had some issues with big controllers lately, so I opted to experiment a bit with a 'vertical slice' implementation where each endpoint has it's own class and namespace together with any specific response and request types. In my opinion it turned out rather well, I'm very happy with how clearly separate each endpoint is, while at the same time all related classes are nicely grouped together. Definitely something to try out in a bigger project at some point. =)
+I've had some issues with big controllers lately, so I opted to experiment a bit
+with a 'vertical slice' implementation where each endpoint has it's own class
+and namespace together with any specific response and request types. In my
+opinion it turned out rather well. I'm very happy with how clearly separate each
+endpoint is, while at the same time all related classes are nicely grouped
+together. Definitely something to try out in a bigger project at some point. =)
 
 ![File Hierarchy](/assets/open-api/part-3-exampled-api/endpoint-file-hiearachy.png "File Hierarchy")  
 *File Hierarchy*
 
 
-I really like immutable types, and nullable reference types so I tried to use record types and enabled nullable reference types, though I'm a bit on the fence whether I would prefer init properties or an explicit constructor, the point being how forced a user is to respect non-nullable reference types. 
+I really appreciate immutable types as well as nullable reference types, so I
+tried to use record types and enabled nullable reference types, though I'm a bit
+on the fence whether I would prefer init properties or an explicit constructor,
+the point being how forced a user is to respect the non-nullable reference
+types. 
 
-For example, a record with a constructor and a `string` field will yield a warning if you assign null explicitly to the field but does not produce a warning if you initialize the record without a value for the given field, yet again on the other hand it's a nice and short syntax. I remain a bit undecided on preference but for now I've opted let requests be records without init properties and responses records with an explicit constructor. 
+For example, a record with a constructor and a `string` field will yield a
+warning if you assign null explicitly to the field. It does not produce a
+warning if you initialize the record without a value for the same field. Yet
+again on the other hand, Init allow for a nice and short syntax. 
+
+I remain a bit undecided on preference but for now, I've opted let requests be
+records with init properties and responses records with an explicit constructor.
+
 
 ```csharp
 var value = new MyRecordType(); // No warning
@@ -44,9 +63,10 @@ var value = new MyRecordType() { Title = null };
 
 ### Document the API with meaningful descriptions
 
-OpenAPI/Swagger plays well with the common C# XML comments, so I added these first.
-Remember to enable generation of documentation files in the associated csproj file.
-I primarily used the summary, remarks and example tags, which I find mesh nicely in the swagger UI output.
+OpenAPI/Swagger plays well with the common C# XML comments, so I added these
+first. You just have to enable generation of documentation files in the
+associated csproj file. I primarily used the `summary`, `remarks` and `example` tags,
+which I think mesh nicely in the swagger UI output.
 
 ```c#
  <PropertyGroup>
@@ -55,7 +75,20 @@ I primarily used the summary, remarks and example tags, which I find mesh nicely
 </PropertyGroup>
 ```
 
-As a side note, I will recommend using `ActionResult<List<Response>>` rather than just `ActionResult` for your controller methods, since the return type will automatically be included in the swagger. Personally, I think adding boilerplate to document the typical http error codes everyone knows is just noise in the documentation so I skipped that on purpose. Any decent integrator should be able to handle 404 HTTP status codes without it being explicit in the documentation. Regarding the generic AuctionResult<> though, it defaults to 200 OK, so if you are documenting a method that return a different success status code, you have to add it explicitly like so, though you still don't need to explicitly state the type;
+As a side note, I will recommend using `ActionResult<List<Response>>` rather
+than just `ActionResult` for your controller methods. This will produce a
+documented return type automatically. 
+
+I could also have added annotations for documenting error code and types, but in
+my opinion, I think adding boilerplate to document the typical http error codes
+everyone knows will just be noise in the documentation. Any decent integrator
+should be able to handle 404 HTTP status codes without it being explicit in the
+documentation.
+
+Regarding the generic AuctionResult<> though, it defaults to 200 OK, so if you
+are documenting a method that return a different success status code, you have
+to add it explicitly like shown below, though you still don't need to state the
+type this way.
 
 ```csharp
 [ProducesResponseType(StatusCodes.Status201Created)]
@@ -68,25 +101,24 @@ public ActionResult<List<Response>> GetAuctionedItems(Guid auctionId)
 }
 ```
 
-The resulting API looks like this
 ![Auction API](/assets/open-api/part-3-exampled-api/auction-api-top-view.png "Auction API")  
 *Auction API*
 
 ![Exampled request](/assets/open-api/part-3-exampled-api/auction-api-exampled-request.png "Exampled request")  
 *Exampled request*
 
-### Support namespaced models for OpenAPI
+### Support namespaced model output for OpenAPI
 
 Since I opted for a namespaced vertical sliced implementation of my controller,
 it fell naturally to also allow duplicate model names, i.e. `Response` and
 `Request` for the top most types per endpoint. I really like to preserve the
 freedom of naming here, because I often see some weird naming decisions and very
-loooong names otherwise, which otherwise becomes necessary to avoid name
-clashes. In my opinion this is simple, nice and easier to work with.
+long names to avoid name clashes otherwise. In my opinion this is simple,
+nice and easier to work with.
 
-It requires us to use namespaces in our OpenApi output too. It's just a
-one-liner, easy peasy. In this case, I even truncated the namespace a bit to
-avoid it being longer than necessary.
+To allow duplicate names, we can use 'pseudo' namespacing in our OpenApi output.
+It's just a one-liner, easy peasy. In this case and at my own peril, I even
+truncated the namespace a bit to avoid it being longer than necessary.
 
 ```csharp
 services.AddSwaggerGen(c =>
@@ -104,13 +136,22 @@ services.AddSwaggerGen(c =>
 
 ### Public never-used parameters should not result in warnings or require disabling-warning annotations
 
-For a long time I've been really annoyed by some warnings I also didn't want to disable entirely,
-and maintaining suppression annotations per class was also ugly. To my happy surprise, JetBrains have a package `JetBrains.Annotations` package with a `PublicAPI` tag that nicely documents the classes and part of a public API and disable the warnings in exactly the right manner. Yes!
+For a long time I've been really annoyed by the MemberCanBePrivate and
+UnusedAutoPropertyAccessor warnings which I also didn't want to disable
+entirely, and maintaining suppression annotations per class felt ugly. 
 
-The cause of the issue is that it's common to create public settable properties
-for API types and then intellisense will think that you don't use those properties.
+I don't want to disable them entirely, because usually they usually add value,
+but on the other hand it's an annoyance, because it's common to have public
+settable properties for API types which are never read or instantiated due to
+them being just flat serializables for your API.
+
+To my happy surprise, JetBrains have package `JetBrains.Annotations` with the
+`PublicAPI` tags that nicely documents your classes as part of a public API and
+disable the warnings. Yes! A similar use case and solution apply for the
+`[UsedImplicitly]` tag.
 
 ```csharp
+// Annoying, ambiguous and verbatim suppressions
 [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
 [SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Global")]
 public class Request
@@ -120,6 +161,7 @@ public class Request
 ```
 
 ```csharp
+// Clean and self-documenting single annotation
 [PublicAPI]
 public class Request
 {
@@ -131,53 +173,75 @@ public class Request
 
 I think this
 [answer|https://stackoverflow.com/questions/64816714/when-to-use-record-vs-class-vs-struct]
-on StackOverflow was nice and to the point. There's a lot more to it, but I like the notion of using the record type for data-transfer like purposes, classes to carry logic and do side effects, and structs for primitives if any.
+on StackOverflow was nice and to the point. There's a lot more to it, but I like
+the notion of using the record type for data-transfer like purposes, classes to
+carry logic and do side effects, and structs for primitives if any.
 
-Basically, **structs** are *pass by value* and should be used to represent single
-value primitives less than 16 byte sizes, comparable to int, double, point ect. 
+Basically, **structs** are *pass by value* and should be used to represent
+single value primitives less than 16 byte sizes, comparable to int, double,
+point ect. 
 
-**Records** are *pass by reference*, by default immutable and a good value type to
-carry data without any added behavior logic.
+**Records** are *pass by reference*, by default immutable and a good value type
+to carry data without any added behavior logic.
 
 **Classes** should be used if you want to encapsulate mutable behavior and
 inheritance.
-
-
----
 
 ### Level 2: Advanced generation example values
 
 * ✔️ Extend the API with meaningful example values.
 * ✔️ Example values should apply in swagger UI when trying an endpoint.
 
-The packages from `Matt Frear`, `Swashbuckle.AspNetCore.Filters` and `Swashbuckle.AspNetCore.Filters.Abstractions` gives a lot more control for generating OpenAPI examples and other fun stuff.
+The packages from `Matt Frear`, `Swashbuckle.AspNetCore.Filters` and
+`Swashbuckle.AspNetCore.Filters.Abstractions` gives a lot more control for
+generating OpenAPI examples and other fun stuff.
 
-Initially I though this was necessary to control example values in my openAPI output,
-but I later discovered that the xml comment `<example>` really does it all.
+Initially I though this was necessary to control example values in my openAPI
+output, but I later discovered that the xml comment `<example>` really does it
+all.
 
-If you have an advanced need, for example if you want to support multiple different examples,
-or for some reason want to generate randomized values for your examples, this could still be a good solution for you. For good measure I've included a couple of screenshots, but in the use cases I had imagined, this is overkill, and thus I will not comment further on this topic here.
+If you have an advanced need, for example, if you want to support multiple
+different examples, or for some reason want to generate randomized values for
+your examples, this could still be a good solution for you. For good measure
+I've included a couple of screenshots, but in the use cases I had imagined, this
+is overkill, and I will not comment further on this topic here.
+
+![Multiple examples dropdown](/assets/open-api/part-3-exampled-api/multiple-examples.png)  
+*Multiple examples dropdown*
 
 ### Level 3
 * ✔️ Leverage C# nullable reference types for documentation
     * ✔️ Nullable value types by default are nullable optional.
-    * ✔️ 'Non-Nullable' value types by default are non-nullable and required.
+    * ✔️ Non-Nullable value types by default are non-nullable and required.
     * ✔️ Nullable reference types by default are nullable optional.
-    * ✔️ 'Non-Nullable' reference types by default are non-nullable and required.
+    * ✔️ Non-Nullable reference types by default are non-nullable and required.
 
 * ✔️ Leverage C# nullable reference types for model validation such that 
     * ✔️ Nullable value types by default are nullable optional.
-    * ✔️ 'Non-Nullable' value types by default are non-nullable and required.
+    * ✔️ Non-Nullable value types by default are non-nullable and required.
     * ✔️ Nullable reference types by default are nullable optional.
-    * ✔️ 'Non-Nullable' reference types by default are non-nullable and required.
+    * ✔️ Non-Nullable reference types by default are non-nullable and required.
 
-I'm very thrilled about nullable reference types and the support for strict intellisense/errors when you misbehave regarding null values. I've debugged a lot of null pointer exceptions, and seen the terrible headaches you risk when the code does not naturally lend it self to clearly documenting when something can be null.
+I'm very thrilled about nullable reference types and the support for strict
+intellisense/errors when you misbehave regarding null values. I've debugged a
+lot of null pointer exceptions, and seen the terrible headaches you risk when
+the code does not naturally lend it self to clearly documenting when something
+can be null.
 
-Examples include APIs where consumers are never really sure if a values can be null or not, and complex domain logic with null checks everywhere because you're never really sure. Leveraging the IDE to help you with static checks for whether or not a null guard is awesome.
+Examples include APIs where consumers are never really sure if a values can be
+null or not, and complex domain logic with null checks everywhere because you're
+never really sure. Leveraging the IDE to help you with static checks for whether
+or not a null guard seems awesome.
 
-Assuming our domain and API implementation on our end is with nullable reference types and configured strict wrt. null checks, it follows naturally that if a field in a response or request model is nullable, it should also be optional and nullable in the generated OpenApi file. Further more, if it's NOT nullable, it should be required and non-nullable. 
+Assuming our domain and API implementation on our end is written with nullable
+reference types and configured strict wrt. null checks, it follows naturally
+that if a field in a response or request model is nullable, it should also be
+optional and nullable in the generated OpenApi file. Further more, if it's NOT
+nullable, it should be required and non-nullable. 
 
-It turns out we can actually enforce this in such a way that we no longer need to annotate our public types with `[Required]` tags, and we can even setup the model validation to follow the same rules! Huzza!
+It turns out we can actually enforce this in such a way that we no longer need
+to annotate our public types with `[Required]` tags, and we can even setup the
+model validation to follow the same rules! Huzza!
 
 #### Leverage nullable types for documentation
 
@@ -207,7 +271,7 @@ Off the bat, the generated document defaults to making everything optional, and 
 ![Request v1](/assets/open-api/part-3-exampled-api/request-v1.png)  
 *Request v1*
 
-If we enable `SupportNonNullableReferenceTypes();` in swagger gen, the nullable flags in the output follow as expected when a reference type is nullable, i.e. `string?` remain nullable and `string` types are now not-nullable.
+If we enable `SupportNonNullableReferenceTypes();` in swagger generator, the nullable flags in the output follow as expected when a reference type is nullable, i.e. `string?` remain nullable and `string` types are now not-nullable.
  
 ```csharp
 services.AddSwaggerGen(c =>
@@ -251,15 +315,18 @@ services.AddSwaggerGen(c =>
 
 #### Leverage nullable types for model validation
 
-Of course, we also want to automatically have our BadRequest responses pop up when ever a request does not follow our documentation!
+Of course, we also want to automatically have our model validation error
+responses pop up when ever a request does not follow our documentation!
 
 By default a required reference type is handled as expected, we get an error if it's not included or set to null in the request. Required value types on the other hand are always deserialized to their default value, for example any missing, required, non-nullable integer values are set to 0.
 
-If we want to fix this, we get into trouble though, since it appears impossible with the default json serializer from `System.Text.Json` since we can't change it's behavior before values are assigned to the model. The best we can do then is to throw an validation error if any value types are set to their default values - which might be a meaningful workaround, but in my opinion somewhat unexpected behavior. 
+If we want to fix this, we get into trouble since it appears unsupported with the default json serializer from `System.Text.Json` as we can't change it's behavior before values are assigned to the model. The best we can do is to throw an validation error if any value types are set to their default values - which might be a meaningful workaround, but in my opinion somewhat unexpected behavior. 
 
-Alternatively we can grab `Microsoft.AspnetCore.Mvc.NewtonstoftJson` and use the good old Newtonsoft serializer instead. 
+Alternatively we can grab `Microsoft.AspnetCore.Mvc.NewtonstoftJson` and use the good old Newtonsoft serializer instead. Let's do that!
 
-Now we want to set missing members to error, such that any misspelled properties result in an error which help us avoid issues on breaking changes for example when we have renamed a nullable field.
+We also want to set missing members to error, such that any misspelled
+properties result in an error which help us avoid issues on breaking changes, for
+example when we have renamed a nullable field.
 
 Finally, we can add a contract resolver that treats non-nullable value types as required on bind time, giving us a nice model validation error such that our required value types are validated in the same manner as our reference types! As an interesting side-note, even marking a non-nullable value types as required will still not give us an error in a default setup.
 
@@ -309,15 +376,15 @@ public class MakeNonNullableValueTypesRequiredResolver : DefaultContractResolver
 I tried out a C\# based NSwag code generation implementation which works more or
 less out of the box. Due to my custom fiddling with the 'fake' added namespaces
 to the models and my fun with vertically sliced controllers a bit of extra
-custom work and maintenance is required, but in my opinion it's easy enough to
+custom work and maintenance was required, but in my opinion it's easy enough to
 work with.
 
 If I should complain about anything, it's the lack of namespace in OpenApi that
 translates to a lack of support in generating types from the OpenApi documents.
 
 My entire setting looks like this, which I find easy enough to work with. The
-extra bits of custom work can be found inside the CustomNameGenerator and
-CustomTypeGenerator and needs to match a similar setup for custom tag names and
+extra bits of custom work can be found inside the `CustomNameGenerator` and
+`CustomTypeGenerator` and needs to match a similar setup for custom tag names and
 operation ids on the side generating the OpenApi input document.
 
 ```csharp
@@ -341,14 +408,22 @@ public class CustomOperationNameGenerator : IOperationNameGenerator
 {
     public bool SupportsMultipleClients => true;
 
-    public string GetClientName(OpenApiDocument document, string path, string httpMethod, OpenApiOperation operation)
+    public string GetClientName(
+        OpenApiDocument document, 
+        string path, 
+        string httpMethod, 
+        OpenApiOperation operation)
     {
         // NOTE: This is only required due to the vertical slicing where each class does not have the classical controller name
         // and is instead all called 'Endpoint'.
         return ConversionUtilities.ConvertToUpperCamelCase(operation.Tags.FirstOrDefault(), false);
     }
 
-    public string GetOperationName(OpenApiDocument document, string path, string httpMethod, OpenApiOperation operation)
+    public string GetOperationName(
+        OpenApiDocument document, 
+        string path, 
+        string httpMethod, 
+        OpenApiOperation operation)
     {
         // NOTE: this assumes operation id is set to method name when you generate the input OpenApi document,
         // and looks a bit neater rather than the default method+path name
@@ -358,7 +433,10 @@ public class CustomOperationNameGenerator : IOperationNameGenerator
 
 public class CustomTypeNameGenerator : ITypeNameGenerator
 {
-    public string Generate(JsonSchema schema, string typeNameHint, IEnumerable<string> reservedTypeNames)
+    public string Generate(
+        JsonSchema schema, 
+        string typeNameHint, 
+        IEnumerable<string> reservedTypeNames)
     {
         // I've set this to contain the partial namespace with '.'
         // but '.' is not valid in the generated output.
@@ -397,10 +475,11 @@ public void Configure(SwaggerGenOptions c)
     });
     ...
 }
+```
 
 ## Sources
 
-* [ActionResult<T>](https://docs.microsoft.com/en-us/aspnet/core/web-api/action-return-types?view=aspnetcore-6.0)
+* [ActionResult\<T\>](https://docs.microsoft.com/en-us/aspnet/core/web-api/action-return-types?view=aspnetcore-6.0)
 * [Enums as strings](https://stackoverflow.com/questions/36452468/swagger-ui-web-api-documentation-present-enums-as-strings)
 * [Swashbuckle and ASP.NET Core](https://docs.microsoft.com/en-us/aspnet/core/tutorials/getting-started-with-swashbuckle?view=aspnetcore-6.0&tabs=visual-studio)
 * [Recommended XML tags for C# documentation comments](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/xmldoc/recommended-tags)
@@ -416,7 +495,7 @@ public void Configure(SwaggerGenOptions c)
 
 ## My Code
 
-* [ExampledApi](https://github.com/tugend/OpenApiExamples/tree/main/ExampledApi
+* [ExampledApi](https://github.com/tugend/OpenApiExamples/tree/main/ExampledApi)
 * [ExampledApiTests](https://github.com/tugend/OpenApiExamples/tree/main/ExampledApiTests)
 * [NSwag Code Generation](https://github.com/tugend/OpenApiExamples/tree/main/ClientStubGenerator)
 * [Code Generation Tests](https://github.com/tugend/OpenApiExamples/tree/main/ClientStubGeneratorTests)
