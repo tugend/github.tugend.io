@@ -3,7 +3,6 @@ category: technical
 tags: programming C# OpenApi 
 layout: post--technical
 title: "Api Versioning (OpenApi 3/3)"
-published: false
 ---
 
 Diverging from my previous approach, I'll try to start this post,
@@ -77,7 +76,6 @@ The resulting API looks like this
 *Exampled request*
 
 ### Support namespaced models for OpenAPI
-<<<<<<< HEAD
 
 Since I opted for a namespaced vertical sliced implementation of my controller,
 it fell naturally to also allow duplicate model names, i.e. `Response` and
@@ -154,84 +152,6 @@ inheritance.
 
 The packages from `Matt Frear`, `Swashbuckle.AspNetCore.Filters` and `Swashbuckle.AspNetCore.Filters.Abstractions` gives a lot more control for generating OpenAPI examples and other fun stuff.
 
-=======
-
-Since I opted for a namespaced vertical sliced implementation of my controller,
-it fell naturally to also allow duplicate model names, i.e. `Response` and
-`Request` for the top most types per endpoint. I really like to preserve the
-freedom of naming here, because I often see some weird naming decisions and very
-loooong names otherwise, which otherwise becomes necessary to avoid name
-clashes. In my opinion this is simple, nice and easier to work with.
-
-It requires us to use namespaces in our OpenApi output too. It's just a
-one-liner, easy peasy. In this case, I even truncated the namespace a bit to
-avoid it being longer than necessary.
-
-```csharp
-services.AddSwaggerGen(c =>
-{
-    ...
-    // Use limited name spacing, show full name from the third '.'
-    // E.g. ExampledApi.Controllers.Auction.GetAuctionedItems.Response -> GetAuctionedItems.Response
-    c.CustomSchemaIds(x => x.FullName?.StripUntil('.', 3));
-    ...
-}
-```
-
-![Name-spaced schemas](/assets/open-api/part-3-exampled-api/namespaced-schemas.png "Name-spaced schemas")  
-*Name-spaced schemas*
-
-### Public never-used parameters should not result in warnings or require disabling-warning annotations
-
-For a long time I've been really annoyed by some warnings I also didn't want to disable entirely,
-and maintaining suppression annotations per class was also ugly. To my happy surprise, JetBrains have a package `JetBrains.Annotations` package with a `PublicAPI` tag that nicely documents the classes and part of a public API and disable the warnings in exactly the right manner. Yes!
-
-The cause of the issue is that it's common to create public settable properties
-for API types and then intellisense will think that you don't use those properties.
-
-```csharp
-[SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
-[SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Global")]
-public class Request
-{
-    /// <example>250</example>
-    public int MinimumBidDkk { get; init; }
-```
-
-```csharp
-[PublicAPI]
-public class Request
-{
-    /// <example>250</example>
-    public int MinimumBidDkk { get; init; }
-```
-
-## Should I use records, structs or classes for my API types?
-
-I think this
-[answer|https://stackoverflow.com/questions/64816714/when-to-use-record-vs-class-vs-struct]
-on StackOverflow was nice and to the point. There's a lot more to it, but I like the notion of using the record type for data-transfer like purposes, classes to carry logic and do side effects, and structs for primitives if any.
-
-Basically, **structs** are *pass by value* and should be used to represent single
-value primitives less than 16 byte sizes, comparable to int, double, point ect. 
-
-**Records** are *pass by reference*, by default immutable and a good value type to
-carry data without any added behavior logic.
-
-**Classes** should be used if you want to encapsulate mutable behavior and
-inheritance.
-
-
----
-
-### Level 2: Advanced generation example values
-
-* ✔️ Extend the API with meaningful example values.
-* ✔️ Example values should apply in swagger UI when trying an endpoint.
-
-The packages from `Matt Frear`, `Swashbuckle.AspNetCore.Filters` and `Swashbuckle.AspNetCore.Filters.Abstractions` gives a lot more control for generating OpenAPI examples and other fun stuff.
-
->>>>>>> 544e75f (draft open-api-3 +2)
 Initially I though this was necessary to control example values in my openAPI output,
 but I later discovered that the xml comment `<example>` really does it all.
 
@@ -379,82 +299,124 @@ public class MakeNonNullableValueTypesRequiredResolver : DefaultContractResolver
 }
 ```
 
-<<<<<<< HEAD
-TODO: cleanup current code base (30 minutes exercise)
-TODO: finish code generation
-TODO: review and cleanup sources
-TODO: review and cleanup text draft
-TODO: publish!
----
-
-=======
->>>>>>> 544e75f (draft open-api-3 +2)
 ### Level 4
 * ✔️ Generate an easy to use out of the box client stub from the API.
     * ✔️ Without model namespace clashes
     * ✔️ Including transferred nullable types
     * Support code generation with selective filtering i.e. only v1, or only for retail api ect.
     * Try to apply it in practice on work example json!
-<<<<<<< HEAD
-=======
+
+I tried out a C\# based NSwag code generation implementation which works more or
+less out of the box. Due to my custom fiddling with the 'fake' added namespaces
+to the models and my fun with vertically sliced controllers a bit of extra
+custom work and maintenance is required, but in my opinion it's easy enough to
+work with.
+
+If I should complain about anything, it's the lack of namespace in OpenApi that
+translates to a lack of support in generating types from the OpenApi documents.
+
+My entire setting looks like this, which I find easy enough to work with. The
+extra bits of custom work can be found inside the CustomNameGenerator and
+CustomTypeGenerator and needs to match a similar setup for custom tag names and
+operation ids on the side generating the OpenApi input document.
+
+```csharp
+var clientSettings = new CSharpClientGeneratorSettings 
+{
+    OperationNameGenerator = new CustomOperationNameGenerator(), 
+    GenerateBaseUrlProperty = false,
+    UseBaseUrl = false,
+    GeneratePrepareRequestAndProcessResponseAsAsyncMethods = false,
+    CSharpGeneratorSettings = 
+    {
+        Namespace = "ExampledApi",
+        GenerateNullableReferenceTypes = true,
+        TypeNameGenerator = new CustomTypeNameGenerator()
+    }
+};
+var clientGenerator = new CSharpClientGenerator(document, clientSettings);
 
 
-TODO: review and cleanup sources
-TODO: finish code generation part of the post
-TODO: try it out on a work API!
-TODO: publish!
----
+public class CustomOperationNameGenerator : IOperationNameGenerator
+{
+    public bool SupportsMultipleClients => true;
 
->>>>>>> 544e75f (draft open-api-3 +2)
+    public string GetClientName(OpenApiDocument document, string path, string httpMethod, OpenApiOperation operation)
+    {
+        // NOTE: This is only required due to the vertical slicing where each class does not have the classical controller name
+        // and is instead all called 'Endpoint'.
+        return ConversionUtilities.ConvertToUpperCamelCase(operation.Tags.FirstOrDefault(), false);
+    }
 
-* https://docs.microsoft.com/en-us/aspnet/core/tutorials/getting-started-with-nswag?view=aspnetcore-6.0&tabs=visual-studio
-* https://aevitas.medium.com/how-to-automatically-generate-clients-for-your-restful-api-fa34a6b408ff
+    public string GetOperationName(OpenApiDocument document, string path, string httpMethod, OpenApiOperation operation)
+    {
+        // NOTE: this assumes operation id is set to method name when you generate the input OpenApi document,
+        // and looks a bit neater rather than the default method+path name
+        return operation.OperationId;
+    }
+}
 
+public class CustomTypeNameGenerator : ITypeNameGenerator
+{
+    public string Generate(JsonSchema schema, string typeNameHint, IEnumerable<string> reservedTypeNames)
+    {
+        // I've set this to contain the partial namespace with '.'
+        // but '.' is not valid in the generated output.
+        return typeNameHint.Replace(".", "");   
+    }
+}
+
+// From ExampledApi, the source project for the OpenApi document
+public void Configure(SwaggerGenOptions c)
+{
+    c.CustomOperationIds(api =>
+    {
+        if (api.ActionDescriptor is ControllerActionDescriptor cad)
+        {
+            return cad.ActionName;
+        }
+        throw new Exception("TODO");
+    });
+
+    ...
+
+    c.TagActionsBy(api =>
+    {
+        if (api.ActionDescriptor is ControllerActionDescriptor cad)
+            return new[]
+            {
+                cad.EndpointMetadata
+                    .Where(x => x is DisplayNameAttribute)
+                    .Cast<DisplayNameAttribute>()
+                    .LastOrDefault()?
+                    .DisplayName
+                    ?? cad.ControllerName
+            };
+        
+        throw new Exception("TODO");
+    });
+    ...
+}
 
 ## Sources
 
-* auto typed return value: https://docs.microsoft.com/en-us/aspnet/core/web-api/action-return-types?view=aspnetcore-6.0
-* enums as strings: https://stackoverflow.com/questions/36452468/swagger-ui-web-api-documentation-present-enums-as-strings
-* XML comments: https://docs.microsoft.com/en-us/aspnet/core/tutorials/getting-started-with-swashbuckle?view=aspnetcore-6.0&tabs=visual-studio
-* XML comments: https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/xmldoc/recommended-tags
-* Conventions: https://docs.microsoft.com/en-us/aspnet/core/web-api/advanced/conventions?view=aspnetcore-6.0
-* Fully qualified namespace for models: https://stackoverflow.com/questions/56475384/swagger-different-classes-in-different-namespaces-with-same-name-dont-work
-* https://stackoverflow.com/questions/41005730/how-to-configure-swashbuckle-to-ignore-property-on-model
-* https://newbedev.com/how-to-configure-swashbuckle-to-ignore-property-on-model
-* https://mattfrear.com/2016/01/25/generating-swagger-example-requests-with-swashbuckle/
-* https://mattfrear.com/2015/04/21/generating-swagger-example-responses-with-swashbuckle/
-* https://github.com/mattfrear/Swashbuckle.Examples
-* https://youtrack.jetbrains.com/issue/RIDER-11836
-* https://jones.bz/c-8-0-nullable-reference-types-in-web-api-validation/
-* https://stackoverflow.com/questions/64816714/when-to-use-record-vs-class-vs-struct
+* [ActionResult<T>](https://docs.microsoft.com/en-us/aspnet/core/web-api/action-return-types?view=aspnetcore-6.0)
+* [Enums as strings](https://stackoverflow.com/questions/36452468/swagger-ui-web-api-documentation-present-enums-as-strings)
+* [Swashbuckle and ASP.NET Core](https://docs.microsoft.com/en-us/aspnet/core/tutorials/getting-started-with-swashbuckle?view=aspnetcore-6.0&tabs=visual-studio)
+* [Recommended XML tags for C# documentation comments](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/xmldoc/recommended-tags)
+* [Name-spacing for Swagger models](https://stackoverflow.com/questions/56475384/swagger-different-classes-in-different-namespaces-with-same-name-dont-work)
+* [Custom SwaggerIgnoreFilter](https://newbedev.com/how-to-configure-swashbuckle-to-ignore-property-on-model)
+* [Example Requests with SwashBuckle](https://mattfrear.com/2016/01/25/generating-swagger-example-requests-with-swashbuckle/)
+* [Example Responses with SwashBuckle](https://mattfrear.com/2015/04/21/generating-swagger-example-responses-with-swashbuckle/)
+* [Swashbuckle.Examples](https://github.com/mattfrear/Swashbuckle.Examples)
+* [PublicAPI+UsedImplicitly](https://youtrack.jetbrains.com/issue/RIDER-11836)
+* [record vs class vs struct](https://stackoverflow.com/questions/64816714/when-to-use-record-vs-class-vs-struct)
+* [Configure Non-nullable types as required 1](https://github.com/domaindrivendev/Swashbuckle.AspNetCore/issues/2036)
+* [Configure non-nullable types as required 2](https://newbedev.com/asp-net-core-require-non-nullable-types)
 
- /// https://newbedev.com/how-to-configure-swashbuckle-to-ignore-property-on-model
-        /// https://github.com/domaindrivendev/Swashbuckle.AspNetCore/issues/2036
-        ///             // https://newbedev.com/how-to-configure-swashbuckle-to-ignore-property-on-model
-// https://newbedev.com/asp-net-core-require-non-nullable-types
+## My Code
 
-// TODO: clear copies should also be included in the sample code
-<<<<<<< HEAD
-=======
-
-## Code 
->>>>>>> 544e75f (draft open-api-3 +2)
-
-## NOTES
-
-## DOTNET WEB API
-1. enable model validation error on { amount: null }, {} for type { amount : non-nullable-int }
-2. enable model validation error on { title: null }, {}, for type { title : non-nullable-string }
-3. Is there a way to enable (1) and (2) without maintenance of individual request models, a global setting?
-
-NotDefaultAttribute: https://andrewlock.net/creating-an-empty-guid-validation-attribute/
-
-## Open API
-A. for (1), non-nullable ints can be marked as required and non-nullable
-B. for (2), non-nullable strings can marked as required and non-nullable
-
-## Synthesis
-* Can (1)+(A) be combined with nullable reference types, i.e. if int? then nullable?
-* Can (2)+(B) be combined with nullable reference types, i.e. if int? then nullable?
-
-
+* [ExampledApi](https://github.com/tugend/OpenApiExamples/tree/main/ExampledApi
+* [ExampledApiTests](https://github.com/tugend/OpenApiExamples/tree/main/ExampledApiTests)
+* [NSwag Code Generation](https://github.com/tugend/OpenApiExamples/tree/main/ClientStubGenerator)
+* [Code Generation Tests](https://github.com/tugend/OpenApiExamples/tree/main/ClientStubGeneratorTests)

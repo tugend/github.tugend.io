@@ -1,5 +1,4 @@
 FROM jekyll/jekyll
-
 WORKDIR /srv/jekyll
 CMD jekyll serve --unpublished --incremental --force_polling
 
