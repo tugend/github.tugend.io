@@ -37,9 +37,8 @@ endpoints should exist in which versions!
   - [Transition from a non-versioned API by configuring a fallback version](#transition-from-a-non-versioned-api-by-configuring-a-fallback-version)
   - [Squared complexity, how to support multiple APIs and API-versions?](#squared-complexity-how-to-support-multiple-apis-and-api-versions)
 - [Sources](#sources)
-  - [Articles](#articles)
-  - [NugetPackages](#nugetpackages)
-  - [Code](#code)
+  - [Articles et. al.](#articles-et-al)
+  - [My Code](#my-code)
 
 ## Implementation Details
 
@@ -266,88 +265,92 @@ The final output we get now looks like this, in our sample API; two deprecated v
 
 ### Squared complexity, how to support multiple APIs and API-versions?
 
-If we want multiple separate versions but ALSO want to have multiple named APIs,
-what then? For example, let's imagine we want to have both a versioned report-
-and a weather API with matching controllers. 
+Now, say we want each combination of API and version in a *separate open api document*. Jikes! 
+For example, let's assume we want to have both a versioned report- and a weather-API. 
 
-We can exploit the definition of semantic versioning here, assuming we only care
-about separating our api per major version, which I would claim is a very
-reasonable assumption (Semantic versioning defines a version as
-Major.Minor.Patch-Status, where status can be any alphanumeric value). 
+Turns out you can actually man-handle the libraries to do this. The following implementation follows from the discussion and referenced code in this [thread](https://github.com/dotnet/aspnet-api-versioning/issues/516). Admittedly, this is clearly going orthogonal to the intended use, on the other hand I think it's rather nice option for some specific use cases even though  you might typically prefer to have multiple groupings per document instead.
 
-First we'll add the name of our API as the status part of the version as shown below.
+The core idea is to generate group name combinations, in this case version and controller name and then output an open api document per such combination. 
+
+To do so, we add a custom `IApiDescriptionProvider` that overrides the 'group name' used to determine which endpoint belongs to which open api document. Since the group name is used for both display name and the swagger document url (at least that's the case in my implementation) we have to make sure the value url-friendly, hence the '_' part.
 
 ```csharp
-// WeatherController.cs
-
-[ApiVersion("2-weather")]
-[ApiVersion("1-weather")]
-[Obsolete("Please upgrade to v3, this version will be removed in December 2030.")]
-[HttpGet("forecasts")]
-public IEnumerable<ForecastV1Response> GetV1Forecast()
-```
-
-![Sample documentation with multiple named and versioned APIs](/assets/open-api/square-api-v1.png)
-
-*Sample documentation with multiple named and versioned APIs*
-
-That worked! Sort of. It would be neater if we moved the pseudo status first.
-We can do that by adding a substitution format to the API Explorer options.
-
-```csharp
-// ConfigureApiExplorer.cs
-
-public void Configure(ApiExplorerOptions options)
+public class SubgroupDescriptionProvider : IApiDescriptionProvider
 {
-    options.GroupNameFormat = "S-V"; // status-major.minor
-    options.SubstitutionFormat = "V/S"; // assume format major minor status
-    options.SubstituteApiVersionInUrl = true;
+    ...
+
+    public void OnProvidersExecuted(ApiDescriptionProviderContext context)
+    {
+        foreach (var result in context.Results)
+        {
+            var versionName = result
+                .GetApiVersion()
+                .ToString(_options.Value.GroupNameFormat);
+
+            var controllerName = (result.ActionDescriptor as ControllerActionDescriptor)?
+                .ControllerName
+                .ToLowerInvariant()
+                ?? throw new Exception("TODO");
+        
+            result.GroupName = $"{controllerName}_{versionName}";
+        }
+    }
 }
+
+services
+    ...
+    .AddTransient<IApiDescriptionProvider, SubgroupDescriptionProvider>()
+    .AddSwaggerGen();
 ```
 
-![Sample documentation with name first](/assets/open-api/square-api-v2.png)
-
-*Sample documentation with name first*
-
-Now, this would be even neater if we could make our drop-down list
-alphabetically ordered too. Let's finish with that by adding a trivial order-by
-at the right place and we're done! Of course you'll still have to add some great
-textual documentation for your documents but that's a different challenge. =)
-
+To convert the url friendly group name when used as a display name, I've made the following somewhat disappointing compromise to reformat the value for both `SwaggerGen`, and `SwaggerUI`. Worth noting too, is also the order-by clause in the second code block, which makes sure the document selector dropdown is nicely ordered.
 
 ```csharp
-// ConfigureSwaggerUi.cs
+public void Configure(SwaggerGenOptions options)
+{
+    ...
+
+    var info = new OpenApiInfo
+    {
+        Title = TitleFormatter.FormatSwaggerGroupNameForDisplay(endpointDescription.GroupName),
+        ...
+    };
+    ...
+}
 
 public void Configure(SwaggerUIOptions options)
 {
-    options.RoutePrefix = "swagger";
+    var endpointDescriptions = _provider.ApiDescriptionGroups.Items;
     
-    foreach (var description in _provider.ApiVersionDescriptions.OrderBy(x => x.GroupName))
+    // Order alphabetically
+    foreach (var item in endpointDescriptions.OrderBy(x => x.GroupName))
     {
-        var url = $"/swagger/{description.GroupName}/swagger.json";
-        var documentName = description.GroupName;
-        options.SwaggerEndpoint(url,  documentName);
-    }        
+        var whereToFindSwaggerJson = $"/swagger/{item.GroupName}/swagger.json"; 
+        var documentSelectorDropdownName = TitleFormatter.FormatSwaggerGroupNameForDisplay(item.GroupName);
+
+        options.SwaggerEndpoint(whereToFindSwaggerJson, documentSelectorDropdownName);
+    }
 }
 ```
 
-![Sample documentation with alphabetically ordering](/assets/open-api/square-api-v3.png)
+![Api groups x versions](/assets/open-api/square-api-v1.png)
 
-*Sample documentation with alphabetically ordering*
+*Api groups x versions*
 
-The sky is the limit, but I think this is a neat proof of concept that I would
-be entirely comfortable to use in a professional setting.
+And that's really it, surely it can be improved further but I would be comfortable something similar to this in a professional setting. I'm quite happy to know this is an option for future larger-scale projects.
+
+A neat by-product of this approach is also that it becomes easier to cleanly generate smaller and distinct OpenApi documents for generating code stubs, i.e. I can avoid generating any code for other versions or APIs than those I want, which I imagine could make the code generation setup and output much neater to work with. =)
+
 
 ## Sources
 
-### Articles
-* [Documentation for the APIExplorers substitution format](https://github.com/dotnet/aspnet-api-versioning/wiki/Version-Format#custom-api-version-format-strings)
-* [Source on combining APIs and versions in Swagger](https://github.com/dotnet/aspnet-api-versioning/issues/516)
+### Articles et. al.
+* [Api Versioning](https://github.com/dotnet/aspnet-api-versioning)
+* [How to version your service](https://github.com/dotnet/aspnet-api-versioning/wiki/How-to-Version-Your-Service)
+* [Versioning guidelines](https://github.com/Microsoft/api-guidelines/blob/master/Guidelines.md#12-versioning)
+* [Discussion on combining APIs and versions in Swagger](https://github.com/dotnet/aspnet-api-versioning/issues/516)
+* [Pedro Faustinos POC on Github](https://github.com/pfaustinopt/SwaggerPoC)
 
-### NugetPackages
-* `Microsoft.AspNetCore.Mvc.Versioning`
-* `Microsoft.AspNetCore.Mvc.Versioning.ApiExplorer`
-
-### Code
+### My Code
 * [ApiVersioning](https://github.com/tugend/OpenApiExamples/tree/main/ApiVersioning)
 * [ApiVersioningTests](https://github.com/tugend/OpenApiExamples/tree/main/ApiVersioningTests)
