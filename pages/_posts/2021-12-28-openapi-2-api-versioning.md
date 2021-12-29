@@ -265,14 +265,25 @@ The final output we get now looks like this, in our sample API; two deprecated v
 
 ### Squared complexity, how to support multiple APIs and API-versions?
 
-Now, say we want each combination of API and version in a *separate open api document*. Jikes! 
-For example, let's assume we want to have both a versioned report- and a weather-API. 
+Now, say we want each combination of API and version in a *separate open api
+document*. Jikes! For example, let's assume we want to have both a versioned
+report- and a weather-API in multiple versions. 
 
-Turns out you can actually man-handle the libraries to do this. The following implementation follows from the discussion and referenced code in this [thread](https://github.com/dotnet/aspnet-api-versioning/issues/516). Admittedly, this is clearly going orthogonal to the intended use, on the other hand I think it's rather nice option for some specific use cases even though  you might typically prefer to have multiple groupings per document instead.
+Turns out you can actually man-handle the libraries to do this. I based my
+implementation on the discussion and referenced code in this
+[thread](https://github.com/dotnet/aspnet-api-versioning/issues/516).
+Admittedly, this is clearly going orthogonal to the intended use, on the other
+hand I think it's rather nice option for some specific use cases even though
+you might typically prefer to have multiple groupings per document instead.
 
-The core idea is to generate group name combinations, in this case version and controller name and then output an open api document per such combination. 
+The core idea is to generate group name combinations, in this case version and
+controller name and then output an open api document per such combination. 
 
-To do so, we add a custom `IApiDescriptionProvider` that overrides the 'group name' used to determine which endpoint belongs to which open api document. Since the group name is used for both display name and the swagger document url (at least that's the case in my implementation) we have to make sure the value url-friendly, hence the '_' part.
+To plot the course, we can start by adding a custom `IApiDescriptionProvider` that overrides the 'group
+name' used to determine which endpoint belongs to which open api document. Since
+the group name is used for both display name and the swagger document url (at
+least that's the case in my implementation) we have to make sure the value is
+url-friendly, hence the '_' part.
 
 ```csharp
 public class SubgroupDescriptionProvider : IApiDescriptionProvider
@@ -296,14 +307,21 @@ public class SubgroupDescriptionProvider : IApiDescriptionProvider
         }
     }
 }
+```
 
+```csharp
 services
     ...
     .AddTransient<IApiDescriptionProvider, SubgroupDescriptionProvider>()
     .AddSwaggerGen();
 ```
 
-To convert the url friendly group name when used as a display name, I've made the following somewhat disappointing compromise to reformat the value for both `SwaggerGen`, and `SwaggerUI`. Worth noting too, is also the order-by clause in the second code block, which makes sure the document selector dropdown is nicely ordered.
+Since the group name is reused as a display name, I've made the following
+somewhat disappointing compromise to reformat the value in both `SwaggerGen`,
+and `SwaggerUI`. 
+
+Worth noting too, is also the order-by clause in the second code block, which
+makes sure the document selector dropdown is nicely ordered.
 
 ```csharp
 public void Configure(SwaggerGenOptions options)
@@ -312,7 +330,7 @@ public void Configure(SwaggerGenOptions options)
 
     var info = new OpenApiInfo
     {
-        Title = TitleFormatter.FormatSwaggerGroupNameForDisplay(endpointDescription.GroupName),
+        Title = FormatSwaggerGroupNameForDisplay(endpointDescription.GroupName),
         ...
     };
     ...
@@ -326,8 +344,7 @@ public void Configure(SwaggerUIOptions options)
     foreach (var item in endpointDescriptions.OrderBy(x => x.GroupName))
     {
         var whereToFindSwaggerJson = $"/swagger/{item.GroupName}/swagger.json"; 
-        var documentSelectorDropdownName = TitleFormatter.FormatSwaggerGroupNameForDisplay(item.GroupName);
-
+        var documentSelectorDropdownName = FormatSwaggerGroupNameForDisplay(item.GroupName);
         options.SwaggerEndpoint(whereToFindSwaggerJson, documentSelectorDropdownName);
     }
 }
@@ -337,9 +354,15 @@ public void Configure(SwaggerUIOptions options)
 
 *Api groups x versions*
 
-And that's really it, surely it can be improved further but I would be comfortable something similar to this in a professional setting. I'm quite happy to know this is an option for future larger-scale projects.
+And that's really it, surely it can be improved further but I would be
+comfortable using something like this in a professional setting. I'm quite happy
+to know this is an option for future larger-scale projects.
 
-A neat by-product of this approach is also that it becomes easier to cleanly generate smaller and distinct OpenApi documents for generating code stubs, i.e. I can avoid generating any code for other versions or APIs than those I want, which I imagine could make the code generation setup and output much neater to work with. =)
+A neat by-product of the solution is also that it becomes easier to cleanly
+generate smaller and distinct OpenApi documents for generating code stubs, i.e.
+I can avoid generating any code for other versions or APIs than those I want,
+which I imagine could make the code generation setup and output much neater to
+work with. =)
 
 
 ## Sources
