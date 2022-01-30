@@ -1,6 +1,5 @@
 ---
 title: Creating a creative pocket dimension
-category: productivity
 tags: efficiency process
 published: true
 ---

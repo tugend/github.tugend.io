@@ -1,7 +1,7 @@
 ---
 title: Cancellation Tokens
-category: code-tips
-tags: language structure c-sharp
+category: technical
+tags: programming C#
 ---
 
 `System.Threading` expose an elegant model for 'coordinating the canceling of
