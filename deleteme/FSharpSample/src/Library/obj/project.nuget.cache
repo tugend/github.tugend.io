@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "NACRMRh0/MR18qCT79Jf737g+6oikHY45pfYMCP61TCkZVOG6C4r0NGJjvaR8zu1RpbZGTmsypFEDFt0+0g5ng==",
+  "success": true,
+  "projectFilePath": "C:\\Users\\tugen\\Documents\\GitHub\\tugend.github.io\\deleteme\\FSharpSample\\src\\Library\\Library.fsproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\tugen\\.nuget\\packages\\fsharp.core\\6.0.1\\fsharp.core.6.0.1.nupkg.sha512"
+  ],
+  "logs": []
+}
