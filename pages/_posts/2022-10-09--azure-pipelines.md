@@ -2,8 +2,8 @@
 category: technical 
 tags: programming node devops 
 layout: post--technical
-title: "Azure Pipelines (pending review)"
-published: true
+title: "Azure Pipelines"
+published: false
 ---
 
 The purpose of this project was to get acquainted with Azure Pipelines. To do
