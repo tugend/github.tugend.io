@@ -3,7 +3,7 @@ category: technical
 tags: programming node devops 
 layout: post--technical
 title: "Azure Pipelines"
-published: true
+published: trueb
 ---
 
 - [Introduction](#introduction)
@@ -12,13 +12,12 @@ published: true
   - [What is a good devops pipeline](#what-is-a-good-devops-pipeline)
 - [The confusion of the dual pipeline setup](#the-confusion-of-the-dual-pipeline-setup)
   - [Build Pipelines](#build-pipelines)
-  - [Example](#example)
   - [Release Pipelines](#release-pipelines)
   - [Why build pipelines deploy management is funky](#why-build-pipelines-deploy-management-is-funky)
   - [Conclusion](#conclusion)
 - [Technical Learnings](#technical-learnings)
   - [Personal opinion](#personal-opinion)
-  - [PercyJs and e2e tests](#percyjs-and-e2e-tests)
+  - [PercyJs and E2E tests](#percyjs-and-e2e-tests)
   - [Sources](#sources)
 
 ## Introduction
@@ -132,7 +131,7 @@ self-contained and explicit configurations which has the advantages of being
 very visible, easy to both read and share, and can be maintained in the same
 version control as everything else. Build pipelines follow this paradigm.
 
-### Example
+#### Example
 
 Here's what a build pipeline looks in Azure. In this case I have three stages,
 build and test, deploy to QA and deploy PROD. Each entry in the deploy overview
@@ -145,9 +144,9 @@ Overview](/assets/azure-pipelines/build-pipelines--deploy-overview.png)
 We can open specific pipeline run up and see the different 'stages' of the
 pipeline, we're also allowed to rerun selected stages.
 
-![Build Pipeline Single Deploy
+![Build Pipeline Run View
 View](/assets/azure-pipelines/build-pipelines--deploy-view.png)
-*Build Pipeline Single Deploy View*
+*Build Pipeline Run View*
 
 Build pipelines do NOT offer proper support for managing and viewing deploys,
 but they do actually support deploys as part of the pipeline. I'll get back to
@@ -295,7 +294,7 @@ that many already consider release pipelines as legacy which is a shame, because
 build pipelines really do not adequately support anything but the most trivial
 deploy needs (in my opinion).
 
-
+#### Example
 
 ![Release Pipeline
 Configuration](/assets/azure-pipelines/release-pipeline--stage-definition.png)
@@ -412,7 +411,7 @@ I will also admit that there's a lot of help in both the community, the docs,
 and the built-in intellisense, they do try to help you figure it out. So it's
 not all bad.
 
-### PercyJs and e2e tests
+### PercyJs and E2E tests
 
 Out of interest, I tried to add visual regression testing to the pipeline. What
 a hassle! My main problem was that the test site I built included platform
@@ -473,36 +472,37 @@ with option to approve*
 ### Sources
 
 #### Code
-* [Sample Website QA | windows.net](https://azgettstdstoraccname.z13.web.core.windows.net/qa/index.html)
+* [Sample Website QA \| windows.net](https://azgettstdstoraccname.z13.web.core.windows.net/qa/index.html)
 
-* [Sample Website Prod | windows.net](https://azgettstdstoraccname.z13.web.core.windows.net/prod/index.html)
+* [Sample Website Prod \| windows.net](https://azgettstdstoraccname.z13.web.core.windows.net/prod/index.html)
 
-* [Code | GitHub](https://github.com/tugend/azure-getting-started) * [Pipeline |
+* [Code \| GitHub](https://github.com/tugend/azure-getting-started) * [Pipeline \|
 dev.azure.com](https://dev.azure.com/tugend0180/azure-getting-started/_git/azure-getting-started)
 
 #### Articles
 
-* [What is Azure Pipelines | learn.microsoft.com](https://learn.microsoft.com/en-us/azure/devops/pipelines/get-started/what-is-azure-pipelines?view=azure-devops)
+* [What is Azure Pipelines \| learn.microsoft.com](https://learn.microsoft.com/en-us/azure/devops/pipelines/get-started/what-is-azure-pipelines?view=azure-devops)
 
-* [Key Concepts in Azure Devops | learn.microsoft.com](https://learn.microsoft.com/en-us/azure/devops/pipelines/get-started/key-pipelines-concepts?view=azure-devops)
+* [Key Concepts in Azure Devops \| learn.microsoft.com](https://learn.microsoft.com/en-us/azure/devops/pipelines/get-started/key-pipelines-concepts?view=azure-devops)
 
-* [task-groups | learn.microsoft.com](https://learn.microsoft.com/en-us/azure/devops/pipelines/library/task-groups?view=azure-devops)
+* [task-groups \| learn.microsoft.com](https://learn.microsoft.com/en-us/azure/devops/pipelines/library/task-groups?view=azure-devops)
 
-* [How to break a single command inside a `script` step on multiple lines | stackoverflow](https://stackoverflow.com/questions/59198459/how-to-break-a-single-command-inside-a-script-step-on-multiple-lines)
+* [How to break a single command inside a `script` step on multiple lines \| stackoverflow](https://stackoverflow.com/questions/59198459/how-to-break-a-single-command-inside-a-script-step-on-multiple-lines)
 
-* [Debugging subscription+principal issue in Azure | brettmckenzie.net](https://brettmckenzie.net/2020/03/23/azure-pipelines-copy-files-task-authentication-failed/)
+* [Debugging subscription+principal issue in Azure \| brettmckenzie.net](https://brettmckenzie.net/2020/03/23/azure-pipelines-copy-files-task-authentication-failed/)
 
-* [Azure Portal for managing subscriptions | portal.azure.com](https://portal.azure.com) 
+* [Azure Portal for managing subscriptions \| portal.azure.com](https://portal.azure.com) 
 
-* [Azure Devops Portal for pipeline and repo | dev.azure.com](https://dev.azure.com/tugend0180) 
+* [Azure Devops Portal for pipeline and repo \| dev.azure.com](https://dev.azure.com/tugend0180) 
 
-* [Azure Container Content (requires login) | portal.azure.com](https://portal.azure.com/#view/Microsoft_Azure_Storage/ContainerMenuBlade/~/overview/storageAccountId/%2Fsubscriptions%2F422db7ec-3d3b-4796-a31d-d7ab8d6f5824%2Fresourcegroups%2Fazure-getting-started-resource-group%2Fproviders%2FMicrosoft.Storage%2FstorageAccounts%2Fazgettstdstoraccname/path/%24web)
+* [Azure Container Content (requires login) \| portal.azure.com](https://portal.azure.com/#view/Microsoft_Azure_Storage/ContainerMenuBlade/~/overview/storageAccountId/%2Fsubscriptions%2F422db7ec-3d3b-4796-a31d-d7ab8d6f5824%2Fresourcegroups%2Fazure-getting-started-resource-group%2Fproviders%2FMicrosoft.Storage%2FstorageAccounts%2Fazgettstdstoraccname/path/%24web)
 
-* [Separate build and release pipelines | blog.bitsrc.io](https://blog.bitsrc.io/separating-build-and-release-pipelines-for-effective-devops-2b0ad5b74af1)
+* [Separate build and release pipelines \| blog.bitsrc.io](https://blog.bitsrc.io/separating-build-and-release-pipelines-for-effective-devops-2b0ad5b74af1)
 
-* [What is CI/CD | wikipedia](https://en.wikipedia.org/wiki/CI/CD) 
+* [What is CI/CD \| wikipedia](https://en.wikipedia.org/wiki/CI/CD) 
 
-* [PercyIO | percy.io](https://percy.io/) * [Running node tests in Docker |
-docs.docker](https://docs.docker.com/language/nodejs/run-tests/) 
+* [PercyIO \| percy.io](https://percy.io/) 
+ 
+* [Running node tests in Docker \| docs.docker](https://docs.docker.com/language/nodejs/run-tests/) 
 
-* [Running testcafe node tests in Docker | testcafe.io](https://testcafe.io/documentation/402838/guides/advanced-guides/use-testcafe-docker-image)
+* [Running testcafe node tests in Docker \| testcafe.io](https://testcafe.io/documentation/402838/guides/advanced-guides/use-testcafe-docker-image)
