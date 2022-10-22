@@ -476,8 +476,9 @@ with option to approve*
 
 * [Sample Website Prod \| windows.net](https://azgettstdstoraccname.z13.web.core.windows.net/prod/index.html)
 
-* [Code \| GitHub](https://github.com/tugend/azure-getting-started) * [Pipeline \|
-dev.azure.com](https://dev.azure.com/tugend0180/azure-getting-started/_git/azure-getting-started)
+* [Code \| GitHub](https://github.com/tugend/azure-getting-started) 
+
+* [Pipeline \| dev.azure.com](https://dev.azure.com/tugend0180/azure-getting-started/_git/azure-getting-started)
 
 #### Articles
 
