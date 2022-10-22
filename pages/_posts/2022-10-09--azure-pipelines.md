@@ -3,7 +3,7 @@ category: technical
 tags: programming node devops 
 layout: post--technical
 title: "Azure Pipelines"
-published: false
+published: true
 ---
 
 - [Introduction](#introduction)
@@ -481,7 +481,6 @@ with option to approve*
 dev.azure.com](https://dev.azure.com/tugend0180/azure-getting-started/_git/azure-getting-started)
 
 #### Articles
-
 
 * [What is Azure Pipelines | learn.microsoft.com](https://learn.microsoft.com/en-us/azure/devops/pipelines/get-started/what-is-azure-pipelines?view=azure-devops)
 
