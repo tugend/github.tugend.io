@@ -441,7 +441,7 @@ import http from 'http'
 ...
 
 test('Standard Render | Main page', async x => {
-    await x.expect(Selector('h1').exists).ok()
+    await x.expect(Selector('h1').exists).ok()b
     await percySnapshot(x, 'Standard Render | Main page');
 });
 ```
@@ -487,7 +487,7 @@ dev.azure.com](https://dev.azure.com/tugend0180/azure-getting-started/_git/azure
 
 * [task-groups \| learn.microsoft.com](https://learn.microsoft.com/en-us/azure/devops/pipelines/library/task-groups?view=azure-devops)
 
-* [How to break a single command inside a `script` step on multiple lines \| stackoverflow](https://stackoverflow.com/questions/59198459/how-to-break-a-single-command-inside-a-script-step-on-multiple-lines)
+* [How to break a single command inside a script step on multiple lines \| stackoverflow](https://stackoverflow.com/questions/59198459/how-to-break-a-single-command-inside-a-script-step-on-multiple-lines)
 
 * [Debugging subscription+principal issue in Azure \| brettmckenzie.net](https://brettmckenzie.net/2020/03/23/azure-pipelines-copy-files-task-authentication-failed/)
 
