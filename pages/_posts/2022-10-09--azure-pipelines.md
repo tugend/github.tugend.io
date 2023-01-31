@@ -3,7 +3,7 @@ category: technical
 tags: programming node devops 
 layout: post--technical
 title: "Azure Pipelines"
-published: trueb
+published: true
 ---
 
 - [Introduction](#introduction)
