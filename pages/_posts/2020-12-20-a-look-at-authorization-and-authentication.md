@@ -1,7 +1,7 @@
 ---
 title: A look at authorization and authentication
-category: security
-tags: programming C#
+category: technical
+tags: programming security
 ---
 
 I often confuse the two very similar looking words; **Authorization** and

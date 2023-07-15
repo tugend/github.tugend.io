@@ -1,6 +1,6 @@
 ---
 title: A look at the Ballerina language 
-category: architecture notes 
+category: languages
 tags: language structure 
 ---
 

@@ -1,6 +1,6 @@
 ---
 category: technical
-tags: programming C# OpenApi
+tags: programming csharp openapi
 layout: post--technical
 title: "Endpoint Versioning (OpenApi 1/3)"
 ---

@@ -1,8 +1,8 @@
 ---
 layout: post--technical
-category: technical 
+category: methodologies 
 tags: programming books
-title: "Code that fits in your head (Book ⭐⭐)"
+title: "Code that fits in your head (⭐)"
 published: true
 ---
 

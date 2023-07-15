@@ -1,6 +1,7 @@
 ---
 title: Creating a creative pocket dimension
 tags: efficiency process
+category: methodologies
 published: true
 ---
 

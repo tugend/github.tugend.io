@@ -1,6 +1,6 @@
 ---
-category: fun 
-tags: programming 
+category: misc 
+tags: programming challenges
 layout: post--technical
 title: "Fun with Codingame"
 published: true

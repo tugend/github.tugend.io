@@ -1,6 +1,6 @@
 ---
 category: technical 
-tags: programming C# OpenApi 
+tags: programming csharp openapi 
 layout: post--technical
 title: "Api Versioning (OpenApi 2/3)"
 ---

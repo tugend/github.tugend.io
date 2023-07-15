@@ -1,8 +1,8 @@
 ---
 layout: post--technical
-title: Notes on domain driven design and event sourcing
-category: architecture notes
-tags: event-sourcing domain-driven-design 
+title: Domain-Driven Design with .NET Core (⭐⭐⭐)
+category: methodologies
+tags: event-sourcing domain-driven-design books
 published: true
 ---
 
