@@ -1,31 +1,26 @@
 ---
+layout: post--technical
 category: technical 
 tags: programming books
-layout: post--technical
-title: "Code that fits in your head (Book)"
+title: "Code that fits in your head (Book ⭐⭐)"
 published: true
 ---
 
-## BETA publish
+![Code That Fits in Your Head](/assets/2023/code-that-fits-in-your-head.jpg "Code That Fits in Your Head")
+> Code That Fits in Your Head; Heuristics for Software Engineering -- Mark Seemann.
 
-Content is subject to change until beta tag is removed.
-
-## Code That Fits in Your Head by Mark Seemann ⭐⭐⚫⚫⚫
-
-![Code That Fits in Your Head by Mark Seemann](/assets/2023/code-that-fits-in-your-head.jpg "Code That Fits in Your Head by Mark Seemann")
-
-A book that worked well as a basis for discussion, but I don't feel it's really
-that well put together. The author seems to be fumbling a bit and I often find
-his references lazy and frustrating; for example he mentions a '*Humble Object
-[66]*' which can then be looked up in the back of the book for a reference to
-'*xUnit Test Patterns ...*'. So what, to understand your point I need to buy a
-different book? In general his style of writing is meandering and a lot of his
-points could have been explained better with 30% of the space.
+A book that worked as a basis for discussion, but I don't feel it's really
+that well put together. The book seems a bit too unstructured and messy for my
+tate, and I often find his references lazy and frustrating; for example he
+mentions a '*Humble Object [66]*' which can be looked up in the back of the book
+for a reference to another book '*xUnit Test Patterns ...*'. So what, to
+understand your point I need to buy a different book? In general his style of
+writing is meandering and a lot of his points could have been explained better
+with 30% of the space.
 
 Several of his points and most of the code examples he shares I find somewhat
-disagreeable. Most of the book seems to me to be re-iterated arguments for
-functional programming, buzz-sentences borrowed from other authors or somewhat
-trivial, common consensus work-flows in the business.
+disagreeable. Most of the book appear to be re-iterated arguments for functional
+programming, buzz-sentences borrowed from other authors or describing somewhat common knowledge at length - like how to use Git.
 
 I took some points to heart though. The book has a lot of other points, these
 are just the ones that non-trivially resonated with me.
@@ -33,10 +28,11 @@ are just the ones that non-trivially resonated with me.
 ### Complexity
 
 I appreciated the description of software engineering in part as a *'deliberate
-process of preventing complexity from growing*', and the point that a complex
-code base requires an increasing amount of time spent on 'storing' an
-understanding in long term memory. This is an imagery of technical debt that I
-really like. :)
+process of preventing complexity from growing*', and the notion of a complex
+code base requiring an increasing amount of time spent working from long term
+memory. The inverse also applies, well structured code should allow a programmer
+to work from short-term memory, simply because each component can be understood
+in separation. This is an imagery of technical debt that I really like. :)
 
 *The goal is not to write code fast. The goal is sustainable software.* [Mark
 Seemann]
@@ -44,7 +40,7 @@ Seemann]
 To reduce complexity he suggests measures of complexity and elimination by
 decomposition. Measures include cyclomatic complexity analysis and simply
 counting the number of 'concepts' per code block and/or the number of code
-lines. More or less boils down to **small, well named methods that do only one
+lines. The point boils down to **small, well named methods that do only one
 thing**.
 
 *Abstraction is the elimination of the irrelevant and the amplification of the
@@ -64,14 +60,13 @@ too many!
 
 ### Other points (paraphrased)
 
-* Refactor OR change; Avoid doing both in the same commit.
-* Do not get used to flaky tests.
+* Refactor or change, don't do both in the same commit.
 * Log all impure actions, nothing more; A very neat guideline in my opinion. :) 
 * Parse, don't validate; Use static factory methods that only return valid
-  models.
-* X-driven development; Make sure to have a measurable driver for the code you
-  write, do not add code that does not make a measurable difference (e.g. in
-  your tests, static analysis, ect.).
+  models for strong encapsulation and protection of invariants.
+* Make sure to have a measurable driver for the code you write, do not add code
+  that does not make a measurable difference (e.g. in your tests, static
+  analysis, ect.).
 * Write your tests outside-in, start at the highest level (acceptance tests) and
   shift down in gear when the combinatorial complexity drives a need for lower
   level tests (unit tests).
