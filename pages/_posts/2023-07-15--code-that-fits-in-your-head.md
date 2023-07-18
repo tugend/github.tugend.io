@@ -70,14 +70,3 @@ too many!
 * Write your tests outside-in, start at the highest level (acceptance tests) and
   shift down in gear when the combinatorial complexity drives a need for lower
   level tests (unit tests).
-
-<style>
-/* Indent chapter image and subtext */
-article > p:nth-child(1),
-article > blockquote:nth-child(1) {
-    text-align: center !important;
-    border: none !important;
-    background: white !important;
-    width:100% !important;
-}
-</style>  

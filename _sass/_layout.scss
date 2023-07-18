@@ -7,7 +7,6 @@
         width: 100%;
     }
 
-
     .logo-header {
       margin-top: -$spacing-unit;
       margin-bottom: $spacing-unit;
@@ -262,5 +261,14 @@
 
         blockquote div {
             background: yellow;
+        }
+
+        /* Indent leading chapter image and subtext for book reviews et. al. */
+        article > p:nth-child(1),
+        article > blockquote:nth-child(2) {
+            text-align: center !important;
+            border: none !important;
+            background: white !important;
+            width:100% !important;
         }
     }

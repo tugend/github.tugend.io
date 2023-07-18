@@ -208,12 +208,3 @@ public class UserAggregate
 It's recommended to generate ids  within the domain, rather than using
 database controlled ids. Controlling ids from the domain may avoid some
 issues wrt. testability, and migration issues later on.
-
-<style>
-/* Indent chapter image and subtext */
-article > p:nth-child(1),
-article > blockquote:nth-child(2) {
-    text-align: center;
-    border: 0px;
-}
-</style>
