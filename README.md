@@ -4,13 +4,13 @@ See guide [here](https://help.github.com/en/github/working-with-github-pages/cre
 
 ## Steps
 
-- Install ruby
+- Install ruby 2.7 {Ruby+Devkit 2.7.8-1 (x64)}
 
-  `find some windows exec`
+  `goto https://rubyinstaller.org/downloads/`
 
 - Install ruby bundler
 
-  `$ gem install bundler`
+  `$ gem install bundler -g`
 
 - Develop and test locally
 
