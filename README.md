@@ -14,7 +14,8 @@ See guide [here](https://help.github.com/en/github/working-with-github-pages/cre
 
 - Develop and test locally
 
-  `$ bundler exec jekyll serve`
+  `$ bundler exec jekyll clean`
+  `$ bundler exec jekyll serve --incremental --unpublished`
 
 - Git commit & push
 
