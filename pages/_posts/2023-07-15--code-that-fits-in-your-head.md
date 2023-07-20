@@ -34,8 +34,7 @@ memory. The inverse also applies, well structured code should allow a programmer
 to work from short-term memory, simply because each component can be understood
 in separation. This is an imagery of technical debt that I really like. :)
 
-*The goal is not to write code fast. The goal is sustainable software.* [Mark
-Seemann]
+*The goal is not to write code fast. The goal is sustainable software.* [Seemann, Mark]
 
 To reduce complexity he suggests measures of complexity and elimination by
 decomposition. Measures include cyclomatic complexity analysis and simply

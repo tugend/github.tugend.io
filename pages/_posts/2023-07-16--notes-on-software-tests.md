@@ -1,27 +1,26 @@
 ---
-title: Notes on test terminology
+title: Notes on Software Tests
 category: methodology
 tags: programming process terminology
 published: false
 ---
 
-![](/assets/tests.jpg)
+![](/assets/notes-on-software-tests--1.png)
+
+## Introduction
 
 There seems to be a lot of competing terms concerning software tests in the
-industry. What's what? Let's try to do a summary overview and finish with a
-recommendation. 
+industry. What's what? I'll try to do a personal summary of definitions and finish with a recommendation. 
 
-The following descriptions are my personal opinions and may differ from
-established definitions.
-
-- [Why test at all](#why-test-at-all)
-- [Writing tests bottom up vs. top down](#writing-tests-bottom-up-vs-top-down)
+- [Introduction](#introduction)
+- [Why write tests](#why-write-tests)
 - [Unit testing](#unit-testing)
 - [Integration testing](#integration-testing)
-- [System testing and acceptance testing](#system-testing-and-acceptance-testing)
-- [End to end tests and regression testing](#end-to-end-tests-and-regression-testing)
-- [Honorable mentions](#honorable-mentions)
-- [Definitions](#definitions)
+- [System testing](#system-testing)
+- [Writing tests bottom up](#writing-tests-bottom-up)
+- [Writing tests top down](#writing-tests-top-down)
+- [Summary](#summary)
+- [Other Definitions](#other-definitions)
   - [Regression Testing](#regression-testing)
   - [Black box testing](#black-box-testing)
   - [White box testing](#white-box-testing)
@@ -29,48 +28,34 @@ established definitions.
   - [Non-functional tests](#non-functional-tests)
   - [Smoke testing](#smoke-testing)
   - [Acceptance testing (User story based testing)](#acceptance-testing-user-story-based-testing)
-  - [System testing](#system-testing)
+  - [System testing](#system-testing-1)
   - [End to end testing](#end-to-end-testing)
   - [Contract testing](#contract-testing)
 - [Load testing or performance testing](#load-testing-or-performance-testing)
-- [Summary](#summary)
 
-## Why test at all
+## Why write tests
 
-* To refactor with confidence
-* To drive implementation
-* To prove code is correct
-* To verify the system is stable
-* To document code behavior
+These are my five pillars of what value I think can be gained by writing tests. Mind you, I don't think one should be religious with respect to tests, a test should be written if it adds -enough- value, and deleted if it no longer is worthwhile to maintain and keep.
 
-## Writing tests bottom up vs. top down
+✅ **Refactor**      : To refactor with confidence  
+✅ **Driver**        : To drive implementation  
+✅ **Correctness**   : To prove code is correct  
+✅ **Stability**     : To verify the code is stable  
+✅ **Documentation** : To document code behavior  
 
-Having tried the classic Test Driven Development approach multiple times, where
-one works bottom up, creates a single class, writes unit tests, then compose the
-classes, write some more tests, ect. works terrible in my opinion. The main
-problem to the approach is the assumption that each components boundary is
-unchanging. The truth is that often you end up changing said boundary multiple
-times during the implementation resulting in very tedious and repeated
-refactorings of all tests too.
+Aside from actual software tests, it's also worth mentioning that often we use a
+lot of 'implicit tests' to ensure code quality and correctness too; this
+includes **compiler checks** and **warnings**, **static analysis** and **code
+reviews** which in my opinion are no less important. 
 
-In my experience the bottom-up approach has absolutely failed to be feasible in
-practice and I would strongly recommend a top down approach instead where you
-prioritize writing acceptance tests from the point of view of the actual
-behavior the system should exhibit and only when the high level tests become a
-challenge due to the number of combinations should you shift gear down towards
-unit tests.
-
-'You can never have to many tests', well if you 75% of development time is used
-to write tests you might have a problem - and no, it's not a matter of just
-making a more elaborate custom testing framework.
-  
 ## Unit testing
 
 An unit test asserts on a 'unit' of code in isolation. This does not need to be
-per class level, but often is.
+per class or function level, but often is.
 
-**Recommended for**; Boundary tests. **Recommended for**; Combinatorial tests.
-**Avoid**; Testing non-branching behavior (Cover these with Acceptance Tests).
+**Recommended for**; Boundary tests.  
+**Recommended for**; Combinatorial tests.  
+**Avoid**; Testing non-branching behavior (Often these will be covered by these with System Tests).
 
 ```csharp
 [Theory]
@@ -79,9 +64,9 @@ per class level, but often is.
 [InlineData(3, 2, 6)]
 public void Multiply(int a, int b, int expected)
 {
-    sut
-      .Multiply(a, b)
-      .ShouldBe(expected);
+    var result = sut.Multiply(a, b);
+      
+    result.ShouldBe(expected);
 }
 ```
 
@@ -90,32 +75,29 @@ public void Multiply(int a, int b, int expected)
 An integration test asserts behavior between two components and as such
 represents a more complex setup and criteria compared to a unit test. I often
 see the term used for database tests, i.e. when commands and queries are
-verified by executing  against an actual database. 
+verified by executing against an actual database. 
 
 ```csharp
 [Fact]
-public void GetPerson()
+public async Task GetPerson()
 {
     var id = await sut.Save("John", 46);
-
+    
     var result = await sut.Get(id);
-
+      
     result.ShouldBe(new Person(id, "John", 46))
 }
 ```
 
-**Recommended for**; Database queries and not much else.
+**Recommended for**; Database queries and not much else.  
 
-## System testing and acceptance testing
+## System testing
 
-High level tests that asserts from outside of the system or program, for
-example, actual HTTP requests hitting a locally running service. Will usually
-require a complex domain specific language and fixture for setting system state
-up to verify - since all invariants ect. applies here.
-
-The acceptance part emphasizes tests that verify business criteria are
-fulfilled, and as such should focus on the important parts of the system, i.e.
-not necessarily that all error messages are correctly formatted ect.
+System testing concern high level tests that asserts from 'outside' of the
+system, for example dispatching actual HTTP requests against the program Will
+usually require a complex domain specific language and fixtures for setting
+system state. As such system tests are also know to be the more difficult to
+write and maintain.
 
 ```csharp
 [Fact]
@@ -133,29 +115,95 @@ public void CancelPayment()
 }
 ```
 
-**Recommended for**; Happy day path scenarios for every feature. **Be careful
-with**; Error path tests at this level since it bloats easily. Consider not
-testing or unit testing instead.
-
-## End to end tests and regression testing
-
-Tests that verify the software runs as expected after deployment, i.e. automated
-tests running against a browser displaying the actual website, or http requests
-hitting the deployed services running in a sandbox environment. Usually rather
-tedious, and often seen as very simple tests that's used mostly to verify
-stability and availability, i.e. did the deploy itself break something, did one
-of our actual dependencies break due to breaking changes in a dependency API.
-
-For example, having a cron job run a Postman suite of requests verifying
-expected http response codes every 10 minutes.
-
-## Honorable mentions
-
-Compiler errors, compiler warnings, static analysis and code reviews are all in
-my opinion also important parts of code quality assurance too. 
+**Recommended for**; Happy day path scenarios for features and functionality.  
+**Be careful with**; Error path tests at this level since the tests bloats easily. Consider not
+testing or unit testing these most of these instead.
 
 
-## Definitions
+## Writing tests bottom up
+
+The **bottom up approach** is often how classic test driven development (TDD) is
+interpreted, and is usually to write a test for the smallest software component
+possible first and then adding tests for compositions all the way up the
+hierarchy of code each test followed by an incremental bit of production code.
+
+For example given we want to implement a calculator, one could write a tests for
+each math function, then write a test for the composition of functions all the
+way up to system tests of the calculator program API itself. This can be likened
+to 'growing' the software from the bottom only writing tests for fully
+functional pieces of code - where the design of each 'level' can be driven and
+supported by tests.
+
+A potential major downside of this approach is that you'll often have a lot of
+redundant tests, i.e. a set of unit tests often end up covering the same as your
+acceptance tests, in other words very rarely will a broken feature result in
+just one failing test. Why is this bad? Because writing and maintaining tests
+takes time and effort.
+
+Additionally, outside of school, one does rarely have a clear design of
+implementation and the developer will change the structure of the code as he
+learns how it can be best to implement - which results in a somewhat tedious
+feedback loop where you often cycle back and refactor unit tests all the time
+due to changes in implementation though the required behavior hasn't changed.
+
+## Writing tests top down
+
+The **top down approach**, go the other way and starts by writing top-level
+tests expressing the end result behavior we want to achieve. 
+
+For example, one could start with writing a walking skeleton of a test our
+calculator by asserting 1+1 works as expected through the UI. 
+
+This approach will often allow you to avoid test redundancies since you'd be
+able to skip writing unit tests for the parts of code that would be covered by
+acceptance tests - so same code coverage, but fewer tests to write and maintain.
+
+
+Because of the tendency of redundancies in test code and the frustration of
+constantly having to do major refactor of the unit tests due to implementation
+changes, I would strongly recommend a top down approach.
+
+I'd advice writing acceptance tests from the point of view of the actual
+behavior the system should exhibit and only when the high level tests become a
+challenge due to the number of combinations should you shift gear down towards
+unit tests.
+
+'You can never have too many tests', well if you 75% of development time is used
+to write tests you have a different problem - and no, it's not a matter of just
+making a more elaborate custom testing framework.
+
+## Summary 
+
+In my opinion, a fully fledged test stack could consist of the following.
+
+* A complex and well polished **system tests** suite that mostly
+  describe the critical, positive behavior of the entire system (acceptance tests).
+* **Integration tests** for SQL queries against an actual database, controller
+  validations and similar multi-component fixture setups.
+* **Unit tests** mostly for input combinations and behavior thresholds.
+
+* **Automated tests** that protects the main branch integrated in your
+  deployment pipeline, including compilation, static analysis, acceptance tests,
+  integration tests and unit tests.
+
+* A continuously running **smoke test suite** with simple assertions to catch
+  breaking changes to other services (requires a test environment) and platform
+  instability.
+
+* **Visual diff end to end test suite** (also a system test) can be recommended
+  for complex websites too and may also cover the need for acceptance tests.
+
+* **Performance test suite**, periodically running a batch of tests to simulate
+  high system load to notice any performance issues, and to have benchmark data
+  for performance improvements.
+
+* Manual verification of new features in both test environment and production,
+  as well as production monitoring and alerts, because there's always something
+  that slips by all the automated tests or that breaks after deployment.
+
+---
+
+## Other Definitions
 
 There's a lot of competing definitions in the industry and depending on
 framework and context from a manual quality test process of the usability and
@@ -167,7 +215,7 @@ definitions of the topic.
 *A type of testing in the software development cycle that runs after every
 change to ensure that the change introduces no unintended breaks.*
 
-https://www.browserstack.com/guide/regression-testing
+👉 [browserstack](https://www.browserstack.com/guide/regression-testing)
 
 ### Black box testing
 
@@ -175,7 +223,8 @@ https://www.browserstack.com/guide/regression-testing
 functionality of an application without peering into its internal structures or
 workings.*
 
-https://en.wikipedia.org/wiki/Black-box_testing
+👉 [wikipedia](https://en.wikipedia.org/wiki/Black-box_testing)
+
 
 A robust testing method that allow internal implementation to change without
 breaking the test coverage or requiring refactoring of tests.
@@ -188,7 +237,7 @@ white-box testing, an internal perspective of the system is used to design test
 cases. The tester chooses inputs to exercise paths through the code and
 determine the expected outputs.*
 
-https://en.wikipedia.org/wiki/White-box_testing
+👉 [wikipedia](https://en.wikipedia.org/wiki/White-box_testing)
 
 White box testing is a bit fragile since creating tests based on how the
 implementation is made results in tests that may become irrelevant when the
@@ -203,7 +252,7 @@ rarely considered (unlike **white-box** testing)*
 
 *Functional testing usually describes what the system does.*
 
-https://en.wikipedia.org/wiki/Functional_testing
+👉 [wikipedia](https://en.wikipedia.org/wiki/Functional_testing)
 
 I.e. testing system behavior wrt. input/output treating the system as a
 'function'.
@@ -214,7 +263,7 @@ I.e. testing system behavior wrt. input/output treating the system as a
 application or system for its non-functional requirements: the way a system
 operates, rather than specific behaviors of that system.*
 
-https://en.wikipedia.org/wiki/Non-functional_testing
+👉 [wikipedia](https://en.wikipedia.org/wiki/Non-functional_testing)
 
 I.e. load testing, security testing, et. al. 
 
@@ -224,7 +273,7 @@ I.e. load testing, security testing, et. al.
 functionality of a component or system, used to aid assessment of whether main
 functions of the software appear to work correctly.*
 
-https://en.wikipedia.org/wiki/Smoke_testing_(software)
+👉 [wikipedia](https://en.wikipedia.org/wiki/Smoke_testing_(software))
 
 From the practice of blowing smoke into pipes to spot any leakages. Often not
 relevant as a concept due to automated tests that cover the same purpose, but
@@ -249,14 +298,14 @@ language and fixture to avoid heavy duplication when writing tests.
 
 *Acceptance testing is a term used in agile software development methodologies,
 particularly extreme programming, referring to the functional testing of a user
-story by the software development team during the implementation phase.[19]
+story by the software development team during the implementation phase.*
 
-The customer specifies scenarios to test when a user story has been correctly
+*The customer specifies scenarios to test when a user story has been correctly
 implemented. A story can have one or many acceptance tests, whatever it takes to
 ensure the functionality works. Acceptance tests are black-box system tests.
 Each acceptance test represents some expected result from the system.*
 
-https://en.wikipedia.org/wiki/Acceptance_testing
+👉 [wikipedia](https://en.wikipedia.org/wiki/Acceptance_testing)
 
 ### System testing
 
@@ -266,7 +315,7 @@ those are usually on a system level depending on the definition of 'system'.
 *System testing examines every component of an application to make sure that
 they work as a complete and unified whole.*
 
-https://www.techtarget.com/searchsoftwarequality/definition/system-testing
+👉 [techtarget](https://www.techtarget.com/searchsoftwarequality/definition/system-testing)
 
 ### End to end testing
 
@@ -279,7 +328,7 @@ database testing, performance testing, security testing, and usability testing.
 Automated testing tools like Selenium, Cypress, and Appium are commonly used for
 E2E testing to improve efficiency and accuracy.*
 
-https://www.browserstack.com/guide/end-to-end-testing
+👉 [browserstack](https://www.browserstack.com/guide/end-to-end-testing)
 
 In my opinion, this is synonymous with system testing but less ambiguous. Often
 used in relation to GUI based browser tests that include visual comparisons.
@@ -291,7 +340,7 @@ as two microservices) are compatible and can communicate with one other. It
 captures the interactions that are exchanged between each service, storing them
 in a contract, which then can be used to verify that both parties adhere to it.*
 
-https://pactflow.io/blog/what-is-contract-testing/
+👉 [pactflow](https://pactflow.io/blog/what-is-contract-testing/)
 
 *Contract testing is the process of defining and verifying (testing) a contract
 between two services, dubbed the “Provider” and the “Consumer”. The service
@@ -318,7 +367,7 @@ contracts". The service provider runs the producer contract tests against the
 client's implementation to ensure that it meets the expected behavior defined in
 the contracts.*
 
-https://www.blazemeter.com/blog/contract-testing
+👉 [blazemeter](https://www.blazemeter.com/blog/contract-testing)
 
 Having some kind of controls to continuously keep track of whether or not
 dependant systems introduce breaking changes seems sensible enough, but I have
@@ -349,32 +398,3 @@ comparison when introducing performance improvements such as caching. It's
 surprisingly common for developers to introduce code changes that 'should'
 improve performance but definitely increase code complexity and risk of
 introducing new bugs. 
-
-## Summary 
-
-In my opinion, a fully fledged test stack could consist of the following.
-
-* A complex and well polished **system test|acceptance tests** suite that mostly
-  describe the critical, positive behavior of the entire system.
-* **Integration tests** for SQL queries against an actual database, controller
-  validations and similar multi-component fixture setups.
-* **Unit tests** mostly for input combinations and behavior thresholds.
-
-* **Automated tests** that protects the main branch integrated in your
-  deployment pipeline, including compilation, static analysis, acceptance tests,
-  integration tests and unit tests.
-
-* A continuously running **smoke test suite** with simple assertions to catch
-  breaking changes to other services (requires a test environment) and platform
-  instability.
-
-* **Visual diff end to end test suite** (also a system test) can be recommended
-  for complex websites too and may also cover the need for acceptance tests.
-
-* **Performance test suite**, periodically running a batch of tests to simulate
-  high system load to notice any performance issues, and to have benchmark data
-  for performance improvements.
-
-* Manual verification of new features in both test environment and production,
-  as well as production monitoring and alerts, because there's always something
-  that slips by all the automated tests or that breaks after deployment.

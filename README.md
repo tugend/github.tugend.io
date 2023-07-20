@@ -21,3 +21,8 @@ See guide [here](https://help.github.com/en/github/working-with-github-pages/cre
   `$ git commit --all`
   `$ git commit -am "change: some commit message"`
   `$ git push`
+
+- Change syntax highlighting theme
+
+- - Preview styles at : https://spsarolkar.github.io/rouge-theme-preview/
+- - Pick a distribution and copy paste replace the _syntax-highlighting.scss file with one from https://github.com/mzlogin/rouge-themes/tree/master/dist
