@@ -1,5 +1,5 @@
 ---
-title: "Autumn Code Challenge"
+title: "Autumn Code Challenge (Prompt)"
 category: challenges
 tags: programming
 published: true
