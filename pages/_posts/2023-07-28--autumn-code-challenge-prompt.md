@@ -58,3 +58,7 @@ For each turn apply the following rules for all cells.
 * **Visualizations**: Razor, React, Svelte, Unity
 * **Backends**; F#, Node.js, Azure
 * **Representation**: Game of Life with hexagons
+
+### Addendum (1th of February 2024)
+
+Check out the end of the challenge [here](https://tugend.github.io/challenges/2024/02/01/autumn-code-challenge-conclusion.html).
