@@ -184,10 +184,38 @@ manageable.
 
 ### Is It Twice As Good? (Rule 11)
 
+...make the big decision about whether to embark on a major rework or keep
+making incremental changes.
+
+Here's my simple rule of thumb for making a big change; is it twice as good?
+
+If you're confident that after your changes, the reworked system will be twice
+as good as the system you've got now, then the reward is big enough to justify
+the disruption and the new problems that the rework will inevitably introduce. 
+
+[p.151, Rules of Programming; Zimmerman]
 
 ### Big Teams Need Strong Conventions (Rule 12)
-### Find the Pebble That Started the Avalance (Rule 13)
+
+No comments.
+
+### Find the Pebble That Started the Avalanche (Rule 13)
+
+To make debugging easier; The author presents a few fuzzy suggestions.
+
+His basic point, in my interpretation, is to write code that fail fast to avoid
+errors becoming evident late in the chain of events, and that stateless
+(functional) programming and event sourcing (executable log files) can make
+retracing and recrating a bug much easier - and therefore also easier to solve.
+
 ### Code Comes in Four Flavors (Rule 14)
+
+Good programmers make simple solutions for easy problems and complicated
+solutions for hard problems, great programmers make simple solutions for both
+easy and hard problems. 
+
+[p.188, Rules of Programming; Zimmerman]
+
 ### Pull the Weeds (Rule 15)
 ### Work Backwards from Your Result, Not Forward From Your Code (Rule 16)
 ### Sometimes the Bigger Problem is Easier to Solve (Rule 17)
