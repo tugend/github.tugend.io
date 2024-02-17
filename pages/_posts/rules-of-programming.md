@@ -217,12 +217,86 @@ easy and hard problems.
 [p.188, Rules of Programming; Zimmerman]
 
 ### Pull the Weeds (Rule 15)
+
+Boy scouting, try to leave the code a bit better after finishing a task than when
+you began it, the weed metaphor is apt because 'weeds breed more weeds' which
+applies both to broken convention, technical debt and confusing comments, all
+the stuff that makes the code more difficult to work with without applying to
+the functionality..
+
 ### Work Backwards from Your Result, Not Forward From Your Code (Rule 16)
+
+A bit of a forced rule in my opinion, his point is to put early emphasis on
+identifying a good solution independent of what you already know and have at
+hand. If you don't, the author argues that you'll risk a 'convenient solution,
+that's inconvenient to use'[p.220, Rules of Programming; Zimmerman].
+
 ### Sometimes the Bigger Problem is Easier to Solve (Rule 17)
+
+Very fuzzy chapter, the point seems to be, sometimes to find the right solution,
+you'll have to find a different angle on the problem, like realize the issue can be formulated
+as a flow problem and the some general algorithmic solution can be applied. 
+
+In all the examples of the general solution being the simpler path, a major
+change in perspective was necessary. The general solution represented a
+completely different way of thinking about hte problem, and this new perspective
+allowed a radically simpler solution.
+
+[p.232, Rules of Programming; Zimmerman]
+
+
 ### Let Your Code Tell Its Own Story (Rule 18)
+
+A chapter where the culture of the author diverges from what I'm used to by
+talking at length about having good meaningful comments in the code. I'm used to
+much more extreme avoidance of comments, because they tend to always end up
+being lazy maintained and in the end misleading or directly false.
+
+We do agree on his two sub-points, don't write comments or names that lie, and
+don't write comments that's just fillers (because of convention or whatever).
+
+The code (and in the opinion of the author also the comments) should tell a
+clear story.
+
 ### Rework In Parallel (Rule 19)
+
+'For each desired change, make the change easy (warning: this may be hard), the
+make the easy change'. [P. 243, Kent Beck quote]
+
+Bit fuzzy chapter, I'd interpret it as doing major changes using a feature
+toggle and canary release, so kinda the Strangler Fig pattern
+[learn.microsoft](https://learn.microsoft.com/en-us/azure/architecture/patterns/strangler-fig).
+
+That is, implement the change but keep existing functionality, write an adaptor
+that picks either the legacy or the new implementation based on a feature
+toggle. Roll out the adaptor in the entire code base but keep feature toggle on
+the legacy path. Roll out for a small set of users or testers and either
+continue rolling out or roll back. Work towards everyone being toggled to use
+the new implementation then remove the legacy code.
+
 ### Do the Math (Rule 20)
+
+Another fuzzy chapter, if you consider doing something that takes time, consider
+if it's worth the time to do by calculating the cost of implementing and compare
+to a conservative measure of expected gain. I can't imagine I'll ever sit down
+and 'do the math' like that but I can make a note of the argued tendency to
+overestimate expected benefit and underestimate expected time to implement. 
+
 ### Sometimes You Just Need to Hammer the Nails (Rule 21)
+
+Don't skip the drudgery. That unlovable task isn't going anywhere. There's no
+hidden army of code elves who'll do the work while you're sleeping. And
+half-completed tasks are a slow poison, working to kill your project. ...Once
+you identify which tasks you tend to avoid, you can be more conscious of giving
+them the priority they deserve. [p. 271-272, Rules of Programming; Zimmerman]
+
+Imagine that you've got a big chunk of wood with a hundred nails sticking out of
+it. They make it impossible to use the chunk of wood for anything else. You
+could just ignore the nails. You could hope that someone else will hammer the
+nails for you. You could spend a lot of time tinkering with a nail-hammering
+machine that might work someday. - or you could just take out your hammer and
+get to work. Sometimes you just need to hammer the nails. [p. 278, Rules of Programming; Zimmerman]
+
 
 ## Naming Things
 
