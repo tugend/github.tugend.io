@@ -231,6 +231,17 @@
 
 /* Technical Post Format
  * ============================================== */
+    .post--book-review {
+        blockquote {
+            font-family: monospace;
+            color: rgb(136, 134, 134);
+            font-weight: normal;
+            display: inline-block;
+            padding: 15px;
+            padding-right: 25px;
+        }
+    }
+
     .post--technical {
         h2, h3, h4, h5 {
             text-align: left;
