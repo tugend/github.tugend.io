@@ -1,7 +1,7 @@
 ---
 title: Cancellation Tokens
-category: technical
-tags: programming csharp
+category: "HTTP Services" 
+tags: async csharp dotnet
 ---
 
 `System.Threading` expose an elegant model for 'coordinating the canceling of

@@ -1,7 +1,7 @@
 ---
 title: Rules of Programming (⭐⭐)
 category: methodologies
-tags: programming heuristics
+tags: book heuristics code-quality
 layout: post--book-review
 published: true
 ---

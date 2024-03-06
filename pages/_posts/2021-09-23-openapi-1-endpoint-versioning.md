@@ -1,12 +1,12 @@
 ---
-category: technical
-tags: programming csharp openapi
+category: "HTTP Services" 
+tags: http open-api dotnet
 layout: post--technical
 title: "Endpoint Versioning (OpenApi 1/3)"
 ---
 
 What I'd like to address is this post, is some of the ways we can
-version our APIs with these tools. Specfically I'll focus on what I would call **'Endpoint Versioning'**.
+version our APIs with these tools. Specifically I'll focus on what I would call **'Endpoint Versioning'**.
 
 This is article the first of three blog posts on the subject of OpenApi.
 * [Part 1: Endpoint Versioning](http://localhost:4000/technical/2021/09/23/openapi-1-endpoint-versioning.html)

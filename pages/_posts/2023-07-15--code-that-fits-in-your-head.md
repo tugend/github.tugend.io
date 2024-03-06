@@ -1,7 +1,7 @@
 ---
 layout: post--technical
 category: methodologies 
-tags: programming books
+tags: book heuristics code-quality c++
 title: "Code that fits in your head (⭐)"
 published: true
 ---

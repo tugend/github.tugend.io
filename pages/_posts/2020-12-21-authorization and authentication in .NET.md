@@ -1,7 +1,7 @@
 ---
 title: Authentication and authorization in .NET
-category: technical
-tags: programming csharp security
+category: "HTTP Services" 
+tags: http api security dotnet csharp
 ---
 
 ## Challenges

@@ -1,7 +1,7 @@
 ---
 title: Notes on Software Tests
-category: methodology
-tags: programming process terminology
+category: methodologies
+tags: software-tests
 published: true
 ---
 

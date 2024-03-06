@@ -1,6 +1,6 @@
 ---
-category: technical 
-tags: programming csharp openapi 
+category: "HTTP Services" 
+tags: http open-api dotnet
 layout: post--technical
 title: "Exampled Api (OpenApi 3/3)"
 ---

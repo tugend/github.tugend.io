@@ -1,7 +1,7 @@
 ---
 title: A look at the Ballerina language 
-category: languages
-tags: language structure 
+category: Other
+tags: programming-languages ballerina
 ---
 
 ![ballerina.io](/assets/ballerina-io.jpg "ballerina.io")

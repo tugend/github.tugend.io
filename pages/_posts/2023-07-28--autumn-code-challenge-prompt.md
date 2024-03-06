@@ -1,7 +1,7 @@
 ---
 title: "Autumn Code Challenge (Prompt)"
 category: challenges
-tags: programming
+tags: creativity architecture
 published: true
 ---
 

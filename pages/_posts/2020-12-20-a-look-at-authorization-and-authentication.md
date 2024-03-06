@@ -1,7 +1,7 @@
 ---
 title: A look at authorization and authentication
-category: technical
-tags: programming security
+category: "HTTP Services" 
+tags: http api security
 ---
 
 I often confuse the two very similar looking words; **Authorization** and

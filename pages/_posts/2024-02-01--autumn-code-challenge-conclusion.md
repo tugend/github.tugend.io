@@ -1,7 +1,7 @@
 ---
 title: "Autumn Code Challenge (Conclusion)"
 category: challenges
-tags: programming, architecture
+tags: creativity architecture software-tests javascript csharp
 published: true
 ---
 

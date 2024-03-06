@@ -1,6 +1,6 @@
 ---
-category: technical 
-tags: programming node devops 
+category: "HTTP Services" 
+tags: devops pipelines node 
 layout: post--technical
 title: "Azure Pipelines"
 published: true

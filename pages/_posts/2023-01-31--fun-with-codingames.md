@@ -1,6 +1,6 @@
 ---
-category: misc 
-tags: programming challenges
+category: challenges 
+tags: algorithms languages
 layout: post--technical
 title: "Fun with Codingame"
 published: true

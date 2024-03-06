@@ -2,7 +2,7 @@
 layout: post--technical
 title: Domain-Driven Design with .NET Core (⭐⭐⭐)
 category: methodologies
-tags: event-sourcing domain-driven-design books
+tags: book event-sourcing domain-driven-design
 published: true
 ---
 
