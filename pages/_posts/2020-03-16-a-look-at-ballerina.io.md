@@ -1,6 +1,6 @@
 ---
 title: A look at the Ballerina language 
-category: Other
+category: Others
 tags: programming-languages ballerina
 ---
 

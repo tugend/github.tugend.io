@@ -121,7 +121,7 @@ No one wants to migrate published resources later on, and since we often end up
 hosting both webpages and different APIs at the same root domain, we might as
 well avoid the trouble from the get go. 
 
-A typical convention is to start API routes with `api/` to distinquish them from
+A typical convention is to start API routes with `api/` to distinguish them from
 e.g. `assets/`.
 
 Further more, we might want to add additional weather resources later on, so we
@@ -182,7 +182,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Since our API is already in use, we could crash the consuming sides' code by
 publishing our breaking change out of the blue. On the other hand we'd like to
-continue work with the new version as soon as posible. Versioning would be a
+continue work with the new version as soon as possible. Versioning would be a
 good solution here, but how should we implement it?
 
 ### How to specify version
@@ -199,7 +199,7 @@ a simple and very flexible solution that could work well if we can assume most
 endpoints are independent of each other and old versions are quickly deprecated
 and removed.
 
-In part 2, I'll compare this approach to API versoining. 
+In part 2, I'll compare this approach to API versioning. 
 
 We'll just add a versioned route per endpoint, and keep our current big OpenApi
 document with all endpoints for said API. For current unversioned endpoints, we
@@ -245,7 +245,7 @@ In this case, we'd have the following models. Notice the version is before the
 last name of the type; This is for consistency reasons, if I
 also want to version my controllers and use the route naming shorthand `[controller]`
 that doesn't work out of the box if my controller name doesn't end in
-Controller. This scheme also fit nice and intuitivly to the versioned routs, i.e. `forecast/v1` matches `ForecastV1Request`.
+Controller. This scheme also fit nice and intuitively to the versioned routs, i.e. `forecast/v1` matches `ForecastV1Request`.
 
 ```csharp
 ForecastV1Response
@@ -350,21 +350,21 @@ already notice some pros and cons to Endpoint Versioning.
 * You can a mess of models in your documentation that belong to deprecated versions.
 
 * As a minor annoyance; two endpoints versions that depend on each other are not
-  neccessarily at the same version, so either you have to accept they are bumped
+  necessarily at the same version, so either you have to accept they are bumped
   to different versions which will be confusing, or you'll have to bump one of
   them several versions to keep them aligned. 
   
   As an example, it could be that you need bump the `GET forecast/v2` with the
   `PUT forecast/v5`.
 
-* A risk of unforseen errors, communication issues and general confusion can
-  arrise if by API consumers end up using different combinations of deprecated
+* A risk of unforeseen errors, communication issues and general confusion can
+  arise if by API consumers end up using different combinations of deprecated
   versioned endpoints. You can't really push for much more than 'try to use the
   newest version of all endpoints' and consumers are often not quick to update
   their use of your API.
 
-* Code maintaince and code reuse risk becoming tedious when the API grows. It's
-  not neccessarily easy to manage reuse across controllers for different but
+* Code maintenance and code reuse risk becoming tedious when the API grows. It's
+  not necessarily easy to manage reuse across controllers for different but
   very similar versions, do you go and duplicate entire controllers, refactor
   for some trans-controller reuse, or have your multiple versioned endpoints in
   the same big controller? The most modular and systematic approach might be to
@@ -372,7 +372,7 @@ already notice some pros and cons to Endpoint Versioning.
 
 * If you want to maintain documentation in your API per endpoint version still
   in use, it can become very tedious to maintain a clear presentable description
-  of what general assumptions apply, since your endpoints vary indepdendently of
+  of what general assumptions apply, since your endpoints vary independently of
   each other.
 
   E.g. imagine having to write "Any monetary amounts will be returned and
@@ -386,7 +386,7 @@ any deprecated endpoints and keep the API clean and fresh.
 
 If on the other hand, you're working on an API that often has breaking changes
 across multiple endpoints and your consumers rarely update their use, you might
-want to consider clearly seperating your API by doing API versioning instead.
+want to consider clearly separating your API by doing API versioning instead.
 This becomes even more relevant if you need to maintain documentation for the
 different versions! 
 
